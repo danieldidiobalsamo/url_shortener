@@ -1,27 +1,22 @@
-use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream};
+use actix_web::{get, http, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use url_shortener_algo;
+use url_shortener_redis_server::{self, RedisClient};
 
-fn main() {
-    let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
+#[get("/encode")]
+async fn shorten_url_request(req: HttpRequest) -> impl Responder {
+    let url = req.query_string();
+    let short = url_shortener_algo::encode_url(&url);
 
-    for stream in listener.incoming() {
-        let stream = stream.unwrap();
-        handle_connection(stream);
-    }
+    let mut redis = RedisClient::new("127.0.0.1", "6379");
+    url_shortener_redis_server::add_url(&mut redis, &short, &url);
+
+    HttpResponse::build(http::StatusCode::OK).body(short) // tmp
 }
 
-fn handle_connection(mut stream: TcpStream) {
-    let mut request = [0; 1024];
-    stream.read(&mut request).unwrap();
-
-    let content = String::from("hello world");
-
-    let response = format!(
-        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
-        content.len(),
-        content
-    );
-
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| App::new().service(shorten_url_request))
+        .bind(("127.0.0.1", 8080))?
+        .run()
+        .await
 }
