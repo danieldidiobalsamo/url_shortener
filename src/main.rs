@@ -1,10 +1,16 @@
-use actix_web::{get, http, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web::{http, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use serde::Deserialize;
 use url_shortener_algo;
 use url_shortener_redis_server::{self, RedisClient};
 
-#[get("/encode")]
-async fn shorten_url_request(req: HttpRequest) -> impl Responder {
-    let url = req.query_string();
+#[derive(Deserialize)]
+struct EncodeReqInfo {
+    url: String,
+}
+
+#[post("/encode")]
+async fn shorten_url_request(info: web::Json<EncodeReqInfo>) -> impl Responder {
+    let url = &info.url;
     let short = url_shortener_algo::encode_url(&url);
 
     let mut redis = RedisClient::new("127.0.0.1", "6379");
