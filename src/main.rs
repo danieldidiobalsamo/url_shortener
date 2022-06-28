@@ -1,16 +1,17 @@
-use actix_web::{get, http, post, web, App, HttpResponse, HttpServer, Responder};
-use serde::Deserialize;
+use actix_web::{get, http, web, App, HttpResponse, HttpServer, Responder};
 use url_shortener_algo;
 use url_shortener_redis_server::{self, RedisClient};
 
-#[derive(Deserialize)]
-struct EncodeReqInfo {
-    url: String,
+#[get("/")]
+async fn index() -> impl Responder {
+    HttpResponse::build(http::StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(include_str!("../static/index.html"))
 }
 
-#[post("/encode")]
-async fn shorten_url_request(info: web::Json<EncodeReqInfo>) -> impl Responder {
-    let url = &info.url;
+#[get("/encode/{url}")]
+async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
+    let url = path.into_inner();
     let short = url_shortener_algo::encode_url(&url);
 
     let mut redis = RedisClient::new("127.0.0.1", "6379");
@@ -35,6 +36,7 @@ async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
+            .service(index)
             .service(shorten_url_request)
             .service(retrieve_full_url)
     })
