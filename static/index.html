@@ -13,7 +13,9 @@
 			method: "GET",
 		}).then(res => res.text())
 		.then(res => {
-				document.getElementById("shortened_url").value = server + "/decode/" + res;
+				let short_input = document.getElementById("shortened_url");
+				short_input.value = server + "/decode/" + res;
+				short_input.select();
 			})
 	}
 
