@@ -31,7 +31,7 @@
 	<div id="app">
 		<div>
 			<label for="encode_btn">Url to shorten </label>
-			<input type="text" name="url" id="url">
+			<input type="text" name="url" id="url" onchange="encode_btn.click()">
 			<button onclick="shortenUrl(document.getElementById('url').value)" id="encode_btn">Encode</button>
 		</div>
 
