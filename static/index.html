@@ -16,20 +16,78 @@
 				document.getElementById("shortened_url").value = server + "/decode/" + res;
 			})
 	}
+
+	function copyToClipboard(){
+		const shortened_url = document.getElementById("shortened_url")
+		shortened_url.select()
+
+		navigator.clipboard.writeText(shortened_url.value)
+	}
+
 	</script>
+
 </head>
 <body>
+	<div id="app">
+		<div>
+			<label for="encode_btn">Url to shorten </label>
+			<input type="text" name="url" id="url">
+			<button onclick="shortenUrl(document.getElementById('url').value)" id="encode_btn">Encode</button>
+		</div>
 
-<div>
-	<label for="encode_btn">Url to shorten : </label>
-	<input type="text" name="url" id="url">
-	<button onclick="shortenUrl(document.getElementById('url').value)" id="encode_btn">Encode</button>
-</div>
+		<div>
+		<label for="shortened_url">Shortened link </label>
+		<input type="text" id="shortened_url">
+		<button onclick="copyToClipboard()">Copy</button>
+		</div>
 
-<div>
-<label for="shortened_url">Shortened link : </label>
-<input type="text" id="shortened_url">
-</div>
+	</div>
+
+
+	<style type="text/css">
+		body{
+			background-color: rgb(230, 230, 230)
+		}
+		#app{
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translateX(-50%) scale(1.5);
+		}
+	</style>
+
+	<div class="ribbon">
+	  <a href="https://github.com/danieldidiobalsamo/url_shortener">Fork me on GitHub</a>
+	</div>
+
+	<style type="text/css">
+		.ribbon {
+		  background-color: black;
+		  /*overflow: hidden;*/
+		  white-space: nowrap;
+		  position: absolute;
+		  right: -50px;
+		  top: 40px;
+		  -webkit-transform: rotate(45deg);
+		     -moz-transform: rotate(45deg);
+		      -ms-transform: rotate(45deg);
+		       -o-transform: rotate(45deg);
+		          transform: rotate(45deg);
+			-webkit-box-shadow: 0 0 10px #888;
+		     -moz-box-shadow: 0 0 10px #888;
+		          box-shadow: 0 0 10px #888;
+		}
+		.ribbon a {
+		  border: 1px solid #faa;
+		  color: #fff;
+		  display: block;
+		  font: bold 81.25% 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		  margin: 1px 0;
+		  padding: 10px 50px;
+		  text-align: center;
+		  text-decoration: none;
+		}
+	</style>
 
 </body>
 </html>
