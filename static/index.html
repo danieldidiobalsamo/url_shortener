@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Url shortener</title>
+
+	<script type="text/javascript">
+		
+	function shortenUrl(url) {
+		const server = "http://127.0.0.1:8080"
+		fetch(server + "/encode/" + encodeURIComponent(url), {
+			method: "GET",
+		}).then(res => res.text())
+		.then(res => {
+				document.getElementById("shortened_url").value = server + "/decode/" + res;
+			})
+	}
+	</script>
+</head>
+<body>
+
+<div>
+	<label for="encode_btn">Url to shorten : </label>
+	<input type="text" name="url" id="url">
+	<button onclick="shortenUrl(document.getElementById('url').value)" id="encode_btn">Encode</button>
+</div>
+
+<div>
+<label for="shortened_url">Shortened link : </label>
+<input type="text" id="shortened_url">
+</div>
+
+</body>
+</html>

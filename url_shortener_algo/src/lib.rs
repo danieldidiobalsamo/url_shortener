@@ -4,7 +4,7 @@ use md5;
 /// - hash the url using MD5
 /// - extracting the 7 first characters
 
-fn encode_url(url: &str) -> String {
+pub fn encode_url(url: &str) -> String {
     let digest = format!("{:x}", md5::compute(&url));
     digest[0..7].to_string()
 }

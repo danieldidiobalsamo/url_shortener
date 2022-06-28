@@ -20,13 +20,13 @@ impl RedisClient {
     }
 }
 
-fn add_url(client: &mut RedisClient, short_url: &str, full_url: &str) {
+pub fn add_url(client: &mut RedisClient, short_url: &str, full_url: &str) {
     let connnection = client.get_connection();
 
     let _: () = connnection.set(short_url, full_url).unwrap();
 }
 
-fn get_full_url(client: &mut RedisClient, short_url: &str) -> String {
+pub fn get_full_url(client: &mut RedisClient, short_url: &str) -> String {
     let connnection = client.get_connection();
     let full: String = connnection.get(short_url).unwrap();
 
