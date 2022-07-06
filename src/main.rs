@@ -40,7 +40,7 @@ async fn main() -> std::io::Result<()> {
             .service(shorten_url_request)
             .service(retrieve_full_url)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("0.0.0.0", 8080))?
     .run()
     .await
 }
