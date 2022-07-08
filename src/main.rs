@@ -1,5 +1,5 @@
+use actix_cors::Cors;
 use actix_web::{get, http, web, App, HttpResponse, HttpServer, Responder};
-use std::sync::Mutex;
 use url_shortener::Config;
 use url_shortener_algo;
 use url_shortener_redis_server::{self, RedisClient};
@@ -12,11 +12,8 @@ async fn index() -> impl Responder {
 }
 
 #[get("/encode/{url}")]
-async fn shorten_url_request(
-    path: web::Path<String>,
-    conf: web::Data<Mutex<Config>>,
-) -> impl Responder {
-    let conf = conf.lock().unwrap();
+async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
+    let conf = Config::new();
 
     let url = path.into_inner();
     let short = url_shortener_algo::encode_url(&url);
@@ -28,11 +25,8 @@ async fn shorten_url_request(
 }
 
 #[get("/decode/{url}")]
-async fn retrieve_full_url(
-    path: web::Path<String>,
-    conf: web::Data<Mutex<Config>>,
-) -> impl Responder {
-    let conf = conf.lock().unwrap();
+async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
+    let conf = Config::new();
 
     let url = path.into_inner();
 
@@ -52,11 +46,19 @@ async fn main() -> std::io::Result<()> {
     let port = conf.shortener_port.parse::<u16>().unwrap();
 
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allowed_origin("*")
+            .allowed_methods(vec!["GET"])
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            .allowed_header(http::header::CONTENT_TYPE)
+            .allowed_header(http::header::LOCATION)
+            .max_age(3600);
+
         App::new()
+            .wrap(cors)
             .service(index)
             .service(shorten_url_request)
             .service(retrieve_full_url)
-            .app_data(conf.clone())
     })
     .bind((ip, port))?
     .run()
