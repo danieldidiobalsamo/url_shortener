@@ -47,7 +47,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("*")
+            .allow_any_origin()
             .allowed_methods(vec!["GET"])
             .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
             .allowed_header(http::header::CONTENT_TYPE)
@@ -55,10 +55,10 @@ async fn main() -> std::io::Result<()> {
             .max_age(3600);
 
         App::new()
-            .wrap(cors)
             .service(index)
             .service(shorten_url_request)
             .service(retrieve_full_url)
+            .wrap(cors)
     })
     .bind((ip, port))?
     .run()
