@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace:  default # TODO: this will change later
+spec:
+  rules:
+  - host: url-shortener-rust.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: url-shortener-service
+            port: 
+              number: 8080
