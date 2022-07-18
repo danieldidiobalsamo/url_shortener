@@ -8,7 +8,7 @@
 	<script type="text/javascript">
 		
 	function shortenUrl(url) {
-		const server = "http://127.0.0.1:8080"
+		const server = "http://url-shortener-rust.com"
 		fetch(server + "/encode/" + encodeURIComponent(url), {
 			method: "GET",
 		}).then(res => res.text())
