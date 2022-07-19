@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: app-ingress
-  namespace: url-shortener
+  namespace: {{ .Values.namespace }}
 spec:
   rules:
   - host: url-shortener-rust.com
