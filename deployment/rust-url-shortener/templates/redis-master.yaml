@@ -19,6 +19,10 @@ spec:
         role: master
         tier: backend
     spec:
+      volumes:
+      - name: redis-pv-storage
+        persistentVolumeClaim:
+          claimName: redis-pv-claim
       containers:
       - name: master
         image: redis
@@ -28,3 +32,6 @@ spec:
             memory: 100Mi
         ports:
         - containerPort: 6379
+        volumeMounts:
+          - mountPath: "/data"
+            name: redis-pv-storage
