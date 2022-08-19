@@ -4,6 +4,10 @@ metadata:
   name: app-ingress
   namespace: {{ .Values.namespace }}
 spec:
+  tls: 
+  - hosts:
+    - url-shortener-rust.com
+    secretName: web-ssl
   rules:
   - host: url-shortener-rust.com
     http:
