@@ -13,7 +13,9 @@ Then open https://url-shortener-rust.com
 
 I recommend to use minikube.
 
-Install minikube : https://minikube.sigs.k8s.io/docs/start/
+- Install minikube : https://minikube.sigs.k8s.io/docs/start/
+- Install kubectl : https://kubernetes.io/docs/tasks/tools/
+- Install helm : https://helm.sh/docs/intro/quickstart/
 
 ~~~
 minikube start
