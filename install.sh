@@ -10,21 +10,21 @@ echo -e '(3/9) Creating cert-manager namespace...\n'
 kubectl create namespace cert-manager
 echo -e 'Done.\n'
 
-echo -e '(4/9) Setup cert-manager...\n'
+echo -e '(4/9) Downloading cert-manager CRDs...\n'
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml
+
+echo -e '(5/9) Setup url-shortener application...\n'
+helm install url-shortener deployment/rust-url-shortener
+echo -e 'Done.\n'
+
+echo -e '(6/9) Setup cert-manager...\n'
 helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --version v1.1.1 \
-  --set installCRDs=true
+  --set installCRDs=false \
+  1>/dev/null # redirect standard output (not error) to null (it shows generic info not relevant with this application usage of cert-manager)
 echo -e 'Done.\n'
-
-echo -e '(5/9) Setup url-shortener...\n'
-helm install url-shortener deployment/rust-url-shortener
-echo -e 'Done.\n'
-
-echo -e '(6/9) Relaunching cert-manager pods...\n'
-# now app secret has been deployed, relaunching certmanager pods
-kubectl delete pods --namespace cert-manager --all --wait=false
 
 echo -e '(7/9) Waiting for all application pods to be ready...\n'
 kubectl wait pods --namespace url-shortener --all --for condition=Ready --timeout=90s
