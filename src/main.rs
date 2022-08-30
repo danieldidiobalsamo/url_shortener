@@ -1,5 +1,6 @@
 use actix_cors::Cors;
 use actix_web::{get, http, web, App, HttpResponse, HttpServer, Responder};
+use ammonia;
 use url_shortener::Config;
 use url_shortener_algo;
 use url_shortener_redis_server::{self, RedisClient};
@@ -15,7 +16,7 @@ async fn index() -> impl Responder {
 async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
     let conf = Config::new();
 
-    let url = path.into_inner();
+    let url = sanitize_input(&path.into_inner());
     let short = url_shortener_algo::encode_url(&url);
 
     let mut redis = RedisClient::new(&conf.redis_ip, &conf.redis_port);
@@ -28,7 +29,7 @@ async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
 async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
     let conf = Config::new();
 
-    let url = path.into_inner();
+    let url = sanitize_input(&path.into_inner());
 
     let mut redis = RedisClient::new(&conf.redis_ip, &conf.redis_port);
     let full = url_shortener_redis_server::get_full_url(&mut redis, &url);
@@ -63,4 +64,26 @@ async fn main() -> std::io::Result<()> {
     .bind((ip, port))?
     .run()
     .await
+}
+
+fn sanitize_input(url: &str) -> String {
+    ammonia::clean(url)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn html_instead_of_url() {
+        const NOT_URL: &str = "Hello<script> world </script>";
+
+        assert_eq!(sanitize_input(&NOT_URL), "Hello");
+    }
+
+    #[test]
+    fn good_input() {
+        const URL: &str = "https://crates.io/";
+        assert_eq!(sanitize_input(&URL), URL);
+    }
 }
