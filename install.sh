@@ -26,8 +26,9 @@ helm install \
   1>/dev/null # redirect standard output (not error) to null (it shows generic info not relevant with this application usage of cert-manager)
 echo -e 'Done.\n'
 
-echo -e '(7/9) Waiting for all application pods to be ready...\n'
-kubectl wait pods --namespace url-shortener --all --for condition=Ready --timeout=90s
+echo -e '(7/9) Waiting for all pods to be ready...\n'
+kubectl wait pods --for condition=ready --namespace cert-manager --all --timeout=120s
+kubectl wait pods --for condition=ready --namespace url-shortener --all --timeout=120s
 echo -e 'Done.\n'
 
 # adding ingress IP to /etc/hosts
