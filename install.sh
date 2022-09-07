@@ -42,11 +42,21 @@ echo -e 'Done.\n'
 # adding ingress IP to /etc/hosts
 mapping="$ip    url-shortener-rust.com"
 
-echo -e '(9/10) I need to write ingress IP in /etc/hosts'
-echo -e "If you prefer to do it manually, please add this line in /etc/hosts and kill this script :"
-echo -e $mapping
-echo "$mapping" | cat - /etc/hosts > /tmp/hosts_tmp && sudo mv /tmp/hosts_tmp /etc/hosts
-echo -e 'Done.\n'
+text="The following resolution has to be written in /etc/hosts
+$mapping
+If you prefer to do it manually, please add this line in /etc/hosts
 
-echo -e '(10/10) Application is deployed !'
-echo -e 'Open this link : https://url-shortener-rust.com'
+Continue ?
+"
+
+if (whiptail --title "url-shortener uninstall" --yesno "$text" 14 60) then
+  echo "need sudo to write in /etc/hosts:"
+  echo "$mapping" | cat - /etc/hosts > /tmp/hosts_tmp && sudo mv /tmp/hosts_tmp /etc/hosts
+
+  echo -e '(10/10) Application is deployed !'
+  echo -e 'Open this link : https://url-shortener-rust.com'
+else
+  echo "Please manually paste this line in /etc/hosts:"
+  echo -e "$mapping\n"
+  echo "Then open this link : https://url-shortener-rust.com"
+fi
