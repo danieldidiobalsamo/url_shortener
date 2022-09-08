@@ -8,7 +8,9 @@ It also removes 'url-shortener-rust.com' resolution in /etc/hosts
 Are you sure to continue ?"
 
 if (whiptail --title "url-shortener uninstall" --yesno "$text" 14 60) then
-    helm uninstall url-shortener
+    echo "helm uninstall..."
+    helm uninstall url-shortener --wait --timeout=120s
+    
     echo "sudo sed -i '/url-shortener-rust.com/d' /etc/hosts"
     sudo sed -i '/url-shortener-rust.com/d' /etc/hosts
 fi
