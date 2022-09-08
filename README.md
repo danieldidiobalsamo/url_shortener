@@ -1,4 +1,5 @@
-# If you have a kubernetes cluster
+# How to launch
+## If you have a kubernetes cluster
 
 Launch `install.sh` script, which will deploy application in a separate namespace, and install cert-manager.
 
@@ -9,7 +10,7 @@ sudo chmod +x install.sh
 
 Then open https://url-shortener-rust.com
 
-# If you don't have a kubernetes cluster
+## If you don't have a kubernetes cluster
 
 I recommend to use minikube.
 
@@ -30,3 +31,11 @@ sudo chmod +x install.sh
 ~~~
 
 You can now open https://url-shortener-rust.com
+
+# How to uninstall
+
+Simply call uninstall script :
+~~~
+sudo chmod +x uninstall.sh
+./uninstall.sh
+~~~
