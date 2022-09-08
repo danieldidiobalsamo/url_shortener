@@ -33,7 +33,7 @@ echo -e 'Done.\n'
 
 echo -e '(8/10) Waiting for ingress to get an IP...\n'
 ip=`kubectl get ingress --field-selector metadata.name=app-ingress --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip`
-until [[ $ip != "" ]]; do
+until [[ "$ip" != "" && "$ip" != "<none>" ]]; do
   ip=`kubectl get ingress --field-selector metadata.name=app-ingress --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip`
 done
 echo -e "$ip assigned\n"
