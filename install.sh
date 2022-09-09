@@ -21,7 +21,7 @@ echo -e '(6/10) Setup cert-manager...\n'
 helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v1.1.1 \
+  --version v1.9.1 \
   --set installCRDs=false \
   1>/dev/null # redirect standard output (not error) to null (it shows generic info not relevant with this application usage of cert-manager)
 echo -e 'Done.\n'
