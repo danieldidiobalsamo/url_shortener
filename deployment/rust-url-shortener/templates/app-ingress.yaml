@@ -6,10 +6,10 @@ metadata:
 spec:
   tls: 
   - hosts:
-    - url-shortener-rust.com
+    - short.home
     secretName: web-ssl
   rules:
-  - host: url-shortener-rust.com
+  - host: short.home
     http:
       paths:
       - pathType: Prefix

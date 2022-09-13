@@ -40,7 +40,7 @@ echo -e "$ip assigned\n"
 echo -e 'Done.\n'
 
 # adding ingress IP to /etc/hosts
-mapping="$ip    url-shortener-rust.com"
+mapping="$ip    short.home"
 
 text="The following resolution has to be written in /etc/hosts
 $mapping
@@ -54,9 +54,9 @@ if (whiptail --title "url-shortener uninstall" --yesno "$text" 14 60) then
   echo "$mapping" | cat - /etc/hosts > /tmp/hosts_tmp && sudo mv /tmp/hosts_tmp /etc/hosts
 
   echo -e '(10/10) Application is deployed !'
-  echo -e 'Open this link : https://url-shortener-rust.com'
+  echo -e 'Open this link : https://short.home'
 else
   echo "Please manually paste this line in /etc/hosts:"
   echo -e "$mapping\n"
-  echo "Then open this link : https://url-shortener-rust.com"
+  echo "Then open this link : https://short.home"
 fi
