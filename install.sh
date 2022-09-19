@@ -50,13 +50,15 @@ echo -e 'Done.\n'
 mapping="$ip    short.home"
 
 text="The following resolution has to be written in /etc/hosts
+
 $mapping
+
 If you prefer to do it manually, please add this line in /etc/hosts
 
 Continue ?
 "
 
-if (whiptail --title "url-shortener uninstall" --yesno "$text" 14 60) then
+if (whiptail --title "url-shortener installation" --yesno "$text" 16 60) then
   echo "need sudo to write in /etc/hosts:"
   echo "$mapping" | cat - /etc/hosts > /tmp/hosts_tmp && sudo mv /tmp/hosts_tmp /etc/hosts
 
