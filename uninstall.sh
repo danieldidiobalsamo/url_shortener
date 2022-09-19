@@ -3,7 +3,7 @@
 text="This script is going to remove url-shortener app, including its persistent volume.
 It won't modify cert-manager namespace.
 
-It also removes 'url-shortener-rust.com' resolution in /etc/hosts
+It also removes 'short.home' resolution in /etc/hosts
 
 Are you sure to continue ?"
 

@@ -32,9 +32,16 @@ kubectl wait pods --for condition=ready --namespace cert-manager --all --timeout
 echo -e 'Done.\n'
 
 echo -e '(8/10) Waiting for ingress to get an IP...\n'
-ip=`kubectl get ingress --field-selector metadata.name=app-ingress --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip`
-until [[ "$ip" != "" && "$ip" != "<none>" ]]; do
-  ip=`kubectl get ingress --field-selector metadata.name=app-ingress --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip`
+
+function getIngressIP () {
+  ip=`kubectl get ingress --field-selector metadata.name=app-ingress --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip | tr -d '\n'`
+  echo $ip
+}
+
+ip=$( getIngressIP )
+until [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]
+do
+  ip=$( getIngressIP )
 done
 echo -e "$ip assigned\n"
 echo -e 'Done.\n'
@@ -43,13 +50,15 @@ echo -e 'Done.\n'
 mapping="$ip    short.home"
 
 text="The following resolution has to be written in /etc/hosts
+
 $mapping
+
 If you prefer to do it manually, please add this line in /etc/hosts
 
 Continue ?
 "
 
-if (whiptail --title "url-shortener uninstall" --yesno "$text" 14 60) then
+if (whiptail --title "url-shortener installation" --yesno "$text" 16 60) then
   echo "need sudo to write in /etc/hosts:"
   echo "$mapping" | cat - /etc/hosts > /tmp/hosts_tmp && sudo mv /tmp/hosts_tmp /etc/hosts
 
