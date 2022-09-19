@@ -32,9 +32,16 @@ kubectl wait pods --for condition=ready --namespace cert-manager --all --timeout
 echo -e 'Done.\n'
 
 echo -e '(8/10) Waiting for ingress to get an IP...\n'
-ip=`kubectl get ingress --field-selector metadata.name=app-ingress --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip`
-until [[ "$ip" != "" && "$ip" != "<none>" ]]; do
-  ip=`kubectl get ingress --field-selector metadata.name=app-ingress --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip`
+
+function getIngressIP () {
+  ip=`kubectl get ingress --field-selector metadata.name=app-ingress --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip | tr -d '\n'`
+  echo $ip
+}
+
+ip=$( getIngressIP )
+until [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]
+do
+  ip=$( getIngressIP )
 done
 echo -e "$ip assigned\n"
 echo -e 'Done.\n'
