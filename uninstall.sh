@@ -11,6 +11,6 @@ if (whiptail --title "url-shortener uninstall" --yesno "$text" 14 60) then
     echo "helm uninstall..."
     helm uninstall url-shortener --wait --timeout=120s
     
-    echo "sudo sed -i '/url-shortener-rust.com/d' /etc/hosts"
-    sudo sed -i '/url-shortener-rust.com/d' /etc/hosts
+    echo "sudo sed -i '/short.home/d' /etc/hosts"
+    sudo sed -i '/short.home/d' /etc/hosts
 fi
