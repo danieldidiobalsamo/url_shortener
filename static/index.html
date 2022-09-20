@@ -7,16 +7,34 @@
 
 	<script type="text/javascript">
 		
+	function isUrl(input){
+		try{
+			new URL(input)
+		}
+		catch(err){
+			return false;
+		}
+
+		return true;
+	}
+
 	function shortenUrl(url) {
-		const server = "https://short.home"
-		fetch(server + "/encode/" + encodeURIComponent(url), {
-			method: "GET",
-		}).then(res => res.text())
-		.then(res => {
-				let short_input = document.getElementById("shortened_url");
-				short_input.value = server + "/decode/" + res;
-				short_input.select();
-			})
+
+		if(isUrl(url)){
+			const server = "https://short.home"
+			fetch(server + "/encode/" + encodeURIComponent(url), {
+				method: "GET",
+			}).then(res => res.text())
+			.then(res => {
+					let short_input = document.getElementById("shortened_url");
+					short_input.value = server + "/decode/" + res;
+					short_input.select();
+				})
+		}
+		else{
+			alert("Bad url")
+		}
+
 	}
 
 	function copyToClipboard(){
