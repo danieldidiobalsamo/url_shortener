@@ -1,4 +1,3 @@
-use actix_cors::Cors;
 use actix_web::{get, http, web, App, HttpResponse, HttpServer, Responder};
 use ammonia;
 use url::Url;
@@ -53,19 +52,10 @@ async fn main() -> std::io::Result<()> {
     let port = conf.shortener_port.parse::<u16>().unwrap();
 
     HttpServer::new(move || {
-        let cors = Cors::default()
-            .allow_any_origin()
-            .allowed_methods(vec!["GET"])
-            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-            .allowed_header(http::header::CONTENT_TYPE)
-            .allowed_header(http::header::LOCATION)
-            .max_age(3600);
-
         App::new()
             .service(index)
             .service(shorten_url_request)
             .service(retrieve_full_url)
-            .wrap(cors)
     })
     .bind((ip, port))?
     .run()
