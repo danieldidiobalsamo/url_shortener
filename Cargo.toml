@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4"
-actix-cors = "0.6.1"
 
 url_shortener_algo = {path = "./url_shortener_algo", version="0.1.0"}
 url_shortener_redis_server = {path = "./url_shortener_redis_server", version="0.1.0"}
