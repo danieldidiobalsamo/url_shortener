@@ -30,14 +30,14 @@ async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
     }
 }
 
-#[get("/decode/{url}")]
+#[get("/decode/{key}")]
 async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
     let conf = Config::new();
 
-    let url = sanitize_input(&path.into_inner());
+    let key = sanitize_input(&path.into_inner());
 
     let mut redis = RedisClient::new(&conf.redis_ip, &conf.redis_port);
-    let full = url_shortener_redis_server::get_full_url(&mut redis, &url);
+    let full = url_shortener_redis_server::get_full_url(&mut redis, &key);
 
     HttpResponse::build(http::StatusCode::MOVED_PERMANENTLY)
         .insert_header(("Location", full))
