@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: url-shortener
-          image: docker.io/library/url_shortener:latest
+          image: docker.io/library/url-shortener:latest
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
