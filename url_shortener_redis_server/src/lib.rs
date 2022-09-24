@@ -1,10 +1,16 @@
+#![warn(missing_docs)]
+
+//! Provides an abstraction layer between redis server and backend
+
 use redis::{Commands, Connection};
 
+/// A struct that implements all necessary methods to interact with redis server
 pub struct RedisClient {
     connection: Connection,
 }
 
 impl RedisClient {
+    /// Makes a connection with redis://{ip}:{port}
     pub fn new(ip: &str, port: &str) -> RedisClient {
         let ip = format!("redis://{}:{}", ip, port);
         let client = redis::Client::open(ip).unwrap();
@@ -15,17 +21,20 @@ impl RedisClient {
         }
     }
 
+    /// Returns a mutable reference to redis server connection
     pub fn get_connection(&mut self) -> &mut Connection {
         &mut self.connection
     }
 }
 
+/// Performs "set <short_url> <full_url>"
 pub fn add_url(client: &mut RedisClient, short_url: &str, full_url: &str) {
     let connnection = client.get_connection();
 
     let _: () = connnection.set(short_url, full_url).unwrap();
 }
 
+/// Performs "get <short_url>" and returns full url
 pub fn get_full_url(client: &mut RedisClient, short_url: &str) -> String {
     let connnection = client.get_connection();
     let full: String = connnection.get(short_url).unwrap();
