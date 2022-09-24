@@ -1,3 +1,7 @@
+#![warn(missing_docs)]
+
+//! Application REST API
+
 use actix_web::{get, http, web, App, HttpResponse, HttpServer, Responder};
 use ammonia;
 use url::Url;
@@ -5,6 +9,7 @@ use url_shortener::Config;
 use url_shortener_algo;
 use url_shortener_redis_server::{self, RedisClient};
 
+/// Returns home page
 #[get("/")]
 async fn index() -> impl Responder {
     HttpResponse::build(http::StatusCode::OK)
@@ -12,6 +17,7 @@ async fn index() -> impl Responder {
         .body(include_str!("../static/index.html"))
 }
 
+/// Returns url corresponding key
 #[get("/encode/{url}")]
 async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
     let conf = Config::new();
@@ -30,6 +36,7 @@ async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
     }
 }
 
+/// Redirects client to decoded url
 #[get("/decode/{key}")]
 async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
     let conf = Config::new();
@@ -44,6 +51,7 @@ async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
         .body("redirecting...")
 }
 
+/// Setup actix server
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let conf = Config::new();
@@ -62,10 +70,12 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
+/// Sanitize content to prevent potential cross site scripting content
 fn sanitize_input(url: &str) -> String {
     ammonia::clean(url)
 }
 
+/// Checks if the given input is a valid url
 fn is_url(input: &str) -> bool {
     if let Ok(_) = Url::parse(input) {
         return true;
