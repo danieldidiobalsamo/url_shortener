@@ -21,22 +21,14 @@ impl RedisClient {
         }
     }
 
-    /// Returns a mutable reference to redis server connection
-    pub fn get_connection(&mut self) -> &mut Connection {
-        &mut self.connection
-    }
-
     /// Performs "set <short_url> <full_url>"
     pub fn add_url(&mut self, short_url: &str, full_url: &str) {
-        let connnection = self.get_connection();
-
-        let _: () = connnection.set(short_url, full_url).unwrap();
+        let _: () = self.connection.set(short_url, full_url).unwrap();
     }
 
     /// Performs "get <short_url>" and returns full url
     pub fn get_full_url(&mut self, short_url: &str) -> String {
-        let connnection = self.get_connection();
-        let full: String = connnection.get(short_url).unwrap();
+        let full: String = self.connection.get(short_url).unwrap();
 
         full
     }
