@@ -25,21 +25,21 @@ impl RedisClient {
     pub fn get_connection(&mut self) -> &mut Connection {
         &mut self.connection
     }
-}
 
-/// Performs "set <short_url> <full_url>"
-pub fn add_url(client: &mut RedisClient, short_url: &str, full_url: &str) {
-    let connnection = client.get_connection();
+    /// Performs "set <short_url> <full_url>"
+    pub fn add_url(&mut self, short_url: &str, full_url: &str) {
+        let connnection = self.get_connection();
 
-    let _: () = connnection.set(short_url, full_url).unwrap();
-}
+        let _: () = connnection.set(short_url, full_url).unwrap();
+    }
 
-/// Performs "get <short_url>" and returns full url
-pub fn get_full_url(client: &mut RedisClient, short_url: &str) -> String {
-    let connnection = client.get_connection();
-    let full: String = connnection.get(short_url).unwrap();
+    /// Performs "get <short_url>" and returns full url
+    pub fn get_full_url(&mut self, short_url: &str) -> String {
+        let connnection = self.get_connection();
+        let full: String = connnection.get(short_url).unwrap();
 
-    full
+        full
+    }
 }
 
 #[cfg(test)]
@@ -57,9 +57,9 @@ mod tests {
 
         let mut client = setup_client();
 
-        add_url(&mut client, short, full);
+        client.add_url(short, full);
 
-        let url_from_server = get_full_url(&mut client, short);
+        let url_from_server = client.get_full_url(short);
 
         assert_eq!(full, url_from_server);
     }
