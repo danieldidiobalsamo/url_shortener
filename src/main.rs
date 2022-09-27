@@ -29,7 +29,7 @@ async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
     } else {
         let short = url_shortener_algo::encode_url(&url);
 
-        let mut redis = RedisClient::new(&conf.redis_ip, &conf.redis_port);
+        let mut redis = RedisClient::new(&conf.redis_socket);
 
         redis.add_url(&short, &url).unwrap_or_else(|err| {
             panic!(
@@ -50,7 +50,7 @@ async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
 
     let key = sanitize_input(&path.into_inner());
 
-    let mut redis = RedisClient::new(&conf.redis_ip, &conf.redis_port);
+    let mut redis = RedisClient::new(&conf.redis_socket);
     let full: String = match redis.get_full_url(&key) {
         Ok(url) => url,
         Err(err) => {
@@ -69,8 +69,10 @@ async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
 async fn main() -> std::io::Result<()> {
     let conf = Config::new();
 
-    let ip = conf.shortener_ip.clone();
-    let port = conf.shortener_port.parse::<u16>().unwrap();
+    let socket = conf.split_app_socket();
+
+    let ip = socket.0;
+    let port = socket.1;
 
     HttpServer::new(move || {
         App::new()

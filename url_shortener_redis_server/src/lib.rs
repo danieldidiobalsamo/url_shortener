@@ -11,8 +11,8 @@ pub struct RedisClient {
 
 impl RedisClient {
     /// Makes a connection with redis://{ip}:{port}
-    pub fn new(ip: &str, port: &str) -> RedisClient {
-        let url = format!("redis://{}:{}", ip, port);
+    pub fn new(socket: &str) -> RedisClient {
+        let url = format!("redis://{}", socket);
 
         let client =
             redis::Client::open(url.clone()).unwrap_or_else(|_| panic!("Bad url: {}", url));
