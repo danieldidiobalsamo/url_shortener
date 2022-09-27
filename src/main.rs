@@ -30,7 +30,14 @@ async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
         let short = url_shortener_algo::encode_url(&url);
 
         let mut redis = RedisClient::new(&conf.redis_ip, &conf.redis_port);
-        url_shortener_redis_server::add_url(&mut redis, &short, &url);
+
+        redis.add_url(&short, &url).unwrap_or_else(|err| {
+            panic!(
+                "Can't set key/value on redis: {:?} {:?}",
+                err.kind(),
+                err.detail()
+            )
+        });
 
         HttpResponse::build(http::StatusCode::OK).body(short)
     }
@@ -44,7 +51,13 @@ async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
     let key = sanitize_input(&path.into_inner());
 
     let mut redis = RedisClient::new(&conf.redis_ip, &conf.redis_port);
-    let full = url_shortener_redis_server::get_full_url(&mut redis, &key);
+    let full: String = match redis.get_full_url(&key) {
+        Ok(url) => url,
+        Err(err) => {
+            println!("{:?} {:?}", err.kind(), err.detail());
+            String::new()
+        }
+    };
 
     HttpResponse::build(http::StatusCode::MOVED_PERMANENTLY)
         .insert_header(("Location", full))
