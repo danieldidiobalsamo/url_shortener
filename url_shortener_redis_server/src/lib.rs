@@ -2,7 +2,7 @@
 
 //! Provides an abstraction layer between redis server and backend
 
-use redis::{Commands, Connection};
+use redis::{Commands, Connection, FromRedisValue, RedisResult};
 
 /// A struct that implements all necessary methods to interact with redis server
 pub struct RedisClient {
@@ -12,9 +12,17 @@ pub struct RedisClient {
 impl RedisClient {
     /// Makes a connection with redis://{ip}:{port}
     pub fn new(ip: &str, port: &str) -> RedisClient {
-        let ip = format!("redis://{}:{}", ip, port);
-        let client = redis::Client::open(ip).unwrap();
-        let connection = client.get_connection().unwrap();
+        let url = format!("redis://{}:{}", ip, port);
+
+        let client =
+            redis::Client::open(url.clone()).unwrap_or_else(|_| panic!("Bad url: {}", url));
+        let connection = match client.get_connection() {
+            Ok(connection) => connection,
+            Err(err) => {
+                println!("Can't create connection with redis server at '{url}'");
+                panic!("{:?} : {:?} {:?}", err.category(), err.kind(), err.detail());
+            }
+        };
 
         Self {
             connection: connection,
@@ -22,15 +30,17 @@ impl RedisClient {
     }
 
     /// Performs "set <short_url> <full_url>"
-    pub fn add_url(&mut self, short_url: &str, full_url: &str) {
-        let _: () = self.connection.set(short_url, full_url).unwrap();
+    pub fn add_url<T: FromRedisValue>(
+        &mut self,
+        short_url: &str,
+        full_url: &str,
+    ) -> RedisResult<T> {
+        self.connection.set(short_url, full_url)
     }
 
     /// Performs "get <short_url>" and returns full url
-    pub fn get_full_url(&mut self, short_url: &str) -> String {
-        let full: String = self.connection.get(short_url).unwrap();
-
-        full
+    pub fn get_full_url<T: FromRedisValue>(&mut self, short_url: &str) -> RedisResult<T> {
+        self.connection.get(short_url)
     }
 }
 
@@ -49,9 +59,22 @@ mod tests {
 
         let mut client = setup_client();
 
-        client.add_url(short, full);
+        client.add_url(&short, &full).unwrap_or_else(|err| {
+            panic!(
+                "Can't set key/value on redis: {:?} {:?} | {:?} {:?}",
+                short,
+                full,
+                err.kind(),
+                err.detail()
+            )
+        });
 
-        let url_from_server = client.get_full_url(short);
+        let url_from_server: String = match client.get_full_url(&short) {
+            Ok(url) => url,
+            Err(err) => {
+                panic!("{:?} {:?}", err.kind(), err.detail());
+            }
+        };
 
         assert_eq!(full, url_from_server);
     }
