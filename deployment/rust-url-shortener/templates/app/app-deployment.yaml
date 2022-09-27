@@ -22,7 +22,7 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: REDIS_SOCKET
-              value: 'redis-service:6379'
             - name: APP_SOCKET
-              value: '0.0.0.0:8080'
+              value: {{ .Values.appSocket }}
+            - name: REDIS_SOCKET
+              value: {{ .Values.redisSocket }}

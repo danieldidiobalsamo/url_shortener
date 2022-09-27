@@ -1,7 +1,7 @@
 #![warn(missing_docs)]
 
 //! Required configuration to make this application work, using environment values defined in :
-//! deployment/rust-url-shortener-templates/app/app-deployment.yaml
+//! deployment/rust-url-shortener/values.yaml
 
 use std::env;
 
