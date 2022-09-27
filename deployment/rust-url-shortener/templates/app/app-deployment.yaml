@@ -22,11 +22,7 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: REDIS_IP
-              value: 'redis-service' 
-            - name: REDIS_PORT
-              value: '6379' 
-            - name: SHORTENER_IP
-              value: '0.0.0.0' 
-            - name: SHORTENER_PORT
-              value: '8080'
+            - name: APP_SOCKET
+              value: {{ .Values.appSocket }}
+            - name: REDIS_SOCKET
+              value: {{ .Values.redisSocket }}
