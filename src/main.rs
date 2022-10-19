@@ -27,19 +27,30 @@ async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
     if !security::is_url(&url) {
         HttpResponse::build(http::StatusCode::BAD_REQUEST).body("Provided url is not valid")
     } else {
-        let short = url_shortener_algo::encode_url(&url);
+        match RedisClient::new(&conf.redis_socket) {
+            Ok(mut redis) => {
+                let short = url_shortener_algo::encode_url(&url);
+                match redis.add_url::<String>(&short, &url) {
+                    Ok(_) => HttpResponse::build(http::StatusCode::OK).body(short),
+                    Err(err) => {
+                        let msg = format!(
+                            "Can't set key/value on redis: {:?} {:?}",
+                            err.kind(),
+                            err.detail()
+                        );
 
-        let mut redis = RedisClient::new(&conf.redis_socket);
+                        println!("{}", msg);
+                        HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body("")
+                    }
+                }
+            }
 
-        redis.add_url(&short, &url).unwrap_or_else(|err| {
-            panic!(
-                "Can't set key/value on redis: {:?} {:?}",
-                err.kind(),
-                err.detail()
-            )
-        });
-
-        HttpResponse::build(http::StatusCode::OK).body(short)
+            Err(err) => {
+                let msg = format!("Can't access redis server : {}", err);
+                println!("{}", msg);
+                HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body("")
+            }
+        }
     }
 }
 
@@ -50,18 +61,30 @@ async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
 
     let key = security::sanitize_input(&path.into_inner());
 
-    let mut redis = RedisClient::new(&conf.redis_socket);
-    let full: String = match redis.get_full_url(&key) {
-        Ok(url) => url,
-        Err(err) => {
-            println!("{:?} {:?}", err.kind(), err.detail());
-            String::new()
-        }
-    };
+    match RedisClient::new(&conf.redis_socket) {
+        Ok(mut redis) => match redis.get_full_url::<String>(&key) {
+            Ok(url) => HttpResponse::build(http::StatusCode::MOVED_PERMANENTLY)
+                .insert_header(("Location", url))
+                .body("redirecting..."),
+            Err(err) => {
+                let msg = format!(
+                    "Can't get full url corresponding to {:?}: {:?} {:?}",
+                    &key,
+                    err.kind(),
+                    err.detail()
+                );
 
-    HttpResponse::build(http::StatusCode::MOVED_PERMANENTLY)
-        .insert_header(("Location", full))
-        .body("redirecting...")
+                println!("{}", msg);
+                HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body("")
+            }
+        },
+
+        Err(err) => {
+            let msg = format!("Can't access redis server : {}", err);
+            println!("{}", msg);
+            HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body("")
+        }
+    }
 }
 
 /// Setup actix server
