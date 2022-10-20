@@ -11,21 +11,26 @@ pub struct RedisClient {
 
 impl RedisClient {
     /// Makes a connection with redis://{ip}:{port}
-    pub fn new(socket: &str) -> RedisClient {
+    pub fn new(socket: &str) -> Result<RedisClient, String> {
         let url = format!("redis://{}", socket);
 
         let client =
             redis::Client::open(url.clone()).unwrap_or_else(|_| panic!("Bad url: {}", url));
-        let connection = match client.get_connection() {
-            Ok(connection) => connection,
-            Err(err) => {
-                println!("Can't create connection with redis server at '{url}'");
-                panic!("{:?} : {:?} {:?}", err.category(), err.kind(), err.detail());
-            }
-        };
 
-        Self {
-            connection: connection,
+        match client.get_connection() {
+            Ok(connection) => Ok(RedisClient {
+                connection: connection,
+            }),
+            Err(err) => {
+                let msg = String::from("Can't create connection with redis server at '{url}'");
+                Err(format!(
+                    "{}\n{:?} : {:?} {:?}",
+                    msg,
+                    err.category(),
+                    err.kind(),
+                    err.detail()
+                ))
+            }
         }
     }
 

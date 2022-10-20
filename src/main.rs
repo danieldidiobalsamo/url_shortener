@@ -3,11 +3,12 @@
 //! Application REST API
 
 use actix_web::{get, http, web, App, HttpResponse, HttpServer, Responder};
-use ammonia;
-use url::Url;
+use std::sync::Mutex;
 use url_shortener::Config;
 use url_shortener_algo;
 use url_shortener_redis_server::{self, RedisClient};
+
+mod security;
 
 /// Returns home page
 #[get("/")]
@@ -19,49 +20,58 @@ async fn index() -> impl Responder {
 
 /// Returns url corresponding key
 #[get("/encode/{url}")]
-async fn shorten_url_request(path: web::Path<String>) -> impl Responder {
-    let conf = Config::new();
+async fn shorten_url_request(
+    redis: web::Data<Mutex<RedisClient>>,
+    path: web::Path<String>,
+) -> impl Responder {
+    let url = security::sanitize_input(&path.into_inner());
+    let mut redis = redis.lock().unwrap();
 
-    let url = sanitize_input(&path.into_inner());
-
-    if !is_url(&url) {
+    if !security::is_url(&url) {
         HttpResponse::build(http::StatusCode::BAD_REQUEST).body("Provided url is not valid")
     } else {
         let short = url_shortener_algo::encode_url(&url);
+        match redis.add_url::<String>(&short, &url) {
+            Ok(_) => HttpResponse::build(http::StatusCode::OK).body(short),
+            Err(err) => {
+                let msg = format!(
+                    "Can't set key/value on redis: {:?} {:?}",
+                    err.kind(),
+                    err.detail()
+                );
 
-        let mut redis = RedisClient::new(&conf.redis_socket);
-
-        redis.add_url(&short, &url).unwrap_or_else(|err| {
-            panic!(
-                "Can't set key/value on redis: {:?} {:?}",
-                err.kind(),
-                err.detail()
-            )
-        });
-
-        HttpResponse::build(http::StatusCode::OK).body(short)
+                println!("{}", msg);
+                HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body("")
+            }
+        }
     }
 }
 
 /// Redirects client to decoded url
 #[get("/decode/{key}")]
-async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
-    let conf = Config::new();
+async fn retrieve_full_url(
+    redis: web::Data<Mutex<RedisClient>>,
+    path: web::Path<String>,
+) -> impl Responder {
+    let key = security::sanitize_input(&path.into_inner());
+    let mut redis = redis.lock().unwrap();
 
-    let key = sanitize_input(&path.into_inner());
-
-    let mut redis = RedisClient::new(&conf.redis_socket);
-    let full: String = match redis.get_full_url(&key) {
-        Ok(url) => url,
+    match redis.get_full_url::<String>(&key) {
+        Ok(url) => HttpResponse::build(http::StatusCode::MOVED_PERMANENTLY)
+            .insert_header(("Location", url))
+            .body("redirecting..."),
         Err(err) => {
-            println!("{:?} {:?}", err.kind(), err.detail());
-            String::new()
-        }
-    };
+            let msg = format!(
+                "Can't get full url corresponding to {:?}: {:?} {:?}",
+                &key,
+                err.kind(),
+                err.detail()
+            );
 
-    HttpResponse::build(http::StatusCode::MOVED_PERMANENTLY)
-        .insert_header(("Location", full))
-        .body("redirecting...")
+            println!("{}", msg);
+            HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body("")
+        }
+    }
 }
 
 /// Setup actix server
@@ -69,13 +79,16 @@ async fn retrieve_full_url(path: web::Path<String>) -> impl Responder {
 async fn main() -> std::io::Result<()> {
     let conf = Config::new();
 
-    let socket = conf.split_app_socket();
+    let redis = RedisClient::new(&conf.redis_socket).unwrap();
+    let redis = web::Data::new(Mutex::new(redis));
 
+    let socket = conf.split_app_socket();
     let ip = socket.0;
     let port = socket.1;
 
     HttpServer::new(move || {
         App::new()
+            .app_data(redis.clone())
             .service(index)
             .service(shorten_url_request)
             .service(retrieve_full_url)
@@ -83,56 +96,4 @@ async fn main() -> std::io::Result<()> {
     .bind((ip, port))?
     .run()
     .await
-}
-
-/// Sanitize content to prevent potential cross site scripting content
-fn sanitize_input(url: &str) -> String {
-    ammonia::clean(url)
-}
-
-/// Checks if the given input is a valid url
-fn is_url(input: &str) -> bool {
-    if let Ok(_) = Url::parse(input) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // sanitize function tests
-    #[test]
-    fn sanitize_html_instead_of_url() {
-        const NOT_URL: &str = "Hello<script> world </script>";
-
-        assert_eq!(sanitize_input(&NOT_URL), "Hello");
-    }
-
-    #[test]
-    fn sanitize_good_input() {
-        const URL: &str = "https://crates.io/";
-        assert_eq!(sanitize_input(&URL), URL);
-    }
-
-    // is_url function tests
-    #[test]
-    fn refuse_not_url() {
-        const URL: &str = "hello";
-        assert_eq!(is_url(&URL), false);
-    }
-
-    #[test]
-    fn validate_good_url() {
-        const URL: &str = "https://crates.io/";
-        assert_eq!(is_url(&URL), true);
-    }
-
-    #[test]
-    fn refuse_incomplete_url() {
-        const URL: &str = "crates.io";
-        assert_eq!(is_url(&URL), false);
-    }
 }
