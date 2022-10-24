@@ -4,4 +4,4 @@ redisSocket: "redis-service:6379"
 
 cert-manager:
   installCRDs: false
-  namespace: cert-manager
+  namespace: url-shortener
