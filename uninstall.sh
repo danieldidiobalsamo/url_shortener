@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 text="This script is going to remove url-shortener app, including its persistent volume.
-It won't modify cert-manager namespace.
 
 It also removes 'short.home' resolution in /etc/hosts
 

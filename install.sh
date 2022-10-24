@@ -1,52 +1,14 @@
 #!/usr/bin/env bash
 
-echo -e '(1/10) Adding offical cert-manager repo (jetstack)...\n'
-helm repo add jetstack https://charts.jetstack.io
-echo -e '(2/10) Updating helm repositories...\n'
-helm repo update
-echo -e 'Done.\n'
-
-echo -e '(3/10) Creating cert-manager namespace...\n'
-kubectl create namespace cert-manager
-echo -e 'Done.\n'
-
-echo -e '(4/10) Downloading cert-manager CRDs...\n'
+echo -e 'Downloading cert-manager CRDs...\n'
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml
 
-echo -e '\n(5/10) Setup url-shortener application...\n'
-helm install url-shortener deployment/rust-url-shortener
+echo -e 'Setup url-shortener application...\n'
+helm install url-shortener deployment/rust-url-shortener --wait
 echo -e 'Done.\n'
 
-echo -e '(6/10) Setup cert-manager...\n'
-helm install \
-  cert-manager jetstack/cert-manager \
-  --namespace cert-manager \
-  --version v1.9.1 \
-  --set installCRDs=false \
-  1>/dev/null # redirect standard output (not error) to null (it shows generic info not relevant with this application usage of cert-manager)
-echo -e 'Done.\n'
-
-echo -e '(7/10) Waiting for all pods to be ready...\n'
-kubectl wait pods --for condition=ready --namespace url-shortener --all --timeout=120s
-kubectl wait pods --for condition=ready --namespace cert-manager --all --timeout=120s
-echo -e 'Done.\n'
-
-echo -e '(8/10) Waiting for ingress to get an IP...\n'
-
-function getIngressIP () {
-  ip=`kubectl get ingress --field-selector metadata.name=app-ingress --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip | tr -d '\n'`
-  echo $ip
-}
-
-ip=$( getIngressIP )
-until [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]
-do
-  ip=$( getIngressIP )
-done
-echo -e "$ip assigned\n"
-echo -e 'Done.\n'
-
-# adding ingress IP to /etc/hosts
+# add ingress IP to /etc/hosts
+ip=`kubectl get ingress --field-selector metadata.name=app-ingress --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip | tr -d '\n'`
 mapping="$ip    short.home"
 
 text="The following resolution has to be written in /etc/hosts
