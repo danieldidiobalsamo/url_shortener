@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata: 
-  name: url-shortener-deployment
+  name: url-shortener
   namespace: {{ .Values.namespace }}
   labels: 
     app: url-shortener

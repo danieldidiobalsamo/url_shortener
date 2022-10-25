@@ -1,6 +1,6 @@
 namespace: url-shortener
 appSocket: "0.0.0.0:8080"
-redisSocket: "redis-service:6379"
+redisSocket: "redis-master:6379"
 
 cert-manager:
   installCRDs: false

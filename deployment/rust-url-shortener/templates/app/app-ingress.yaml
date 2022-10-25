@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: app-ingress
+  name: url-shortener
   namespace: {{ .Values.namespace }}
 spec:
   tls: 
@@ -16,6 +16,6 @@ spec:
         path: "/"
         backend:
           service:
-            name: url-shortener-service
+            name: url-shortener
             port: 
               number: 8080
