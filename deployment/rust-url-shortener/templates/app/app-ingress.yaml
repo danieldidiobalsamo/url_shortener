@@ -6,10 +6,10 @@ metadata:
 spec:
   tls: 
   - hosts:
-    - short.home
+    - {{ .Values.applicationUrl }}
     secretName: web-ssl
   rules:
-  - host: short.home
+  - host: {{ .Values.applicationUrl }}
     http:
       paths:
       - pathType: Prefix

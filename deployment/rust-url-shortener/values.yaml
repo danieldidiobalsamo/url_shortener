@@ -1,6 +1,8 @@
 namespace: url-shortener
-appSocket: "0.0.0.0:8080"
-redisSocket: "redis-master:6379"
+
+appSocket: "0.0.0.0:8080" # socket that app is listening on
+redisSocket: "redis-master:6379" # socket that redis is listening on
+applicationUrl: short.home # url to reach app : https://<applicationUrl>
 
 cert-manager:
   installCRDs: false
