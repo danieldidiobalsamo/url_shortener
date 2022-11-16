@@ -3,6 +3,9 @@ kind: Ingress
 metadata:
   name: url-shortener
   namespace: {{ .Values.namespace }}
+  annotations:
+    cert-manager.io/issuer: letsencrypt-issuer
+  name: url-shortener
 spec:
   tls: 
   - hosts:
