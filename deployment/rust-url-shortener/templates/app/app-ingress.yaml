@@ -9,10 +9,10 @@ metadata:
 spec:
   tls: 
   - hosts:
-    - {{ .Values.applicationUrl }}
+    - {{ .Values.applicationDomainName }}
     secretName: web-ssl
   rules:
-  - host: {{ .Values.applicationUrl }}
+  - host: {{ .Values.applicationDomainName }}
     http:
       paths:
       - pathType: Prefix
