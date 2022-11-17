@@ -15,7 +15,7 @@ domainName=$(whiptail --title "url-shortener installation" --inputbox "$text" 16
 # deploy app
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
 helm install url-shortener deployment/rust-url-shortener \
-  --set applicationUrl=$domainName \
+  --set applicationDomainName=$domainName \
   --wait
 echo -e 'Done.\n'
 
