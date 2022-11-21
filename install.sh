@@ -14,13 +14,13 @@ domainName=$(whiptail --title "url-shortener installation" --inputbox "$text" 16
 
 # deploy app
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
-helm install url-shortener backend/deployment/rust-url-shortener \
+helm install url-shortener-backend backend/deployment/url-shortener-backend \
   --set applicationDomainName=$domainName \
   --wait
 echo -e 'Done.\n'
 
 # add ingress IP to /etc/hosts
-ip=`kubectl get ingress --field-selector metadata.name=url-shortener --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip | tr -d '\n'`
+ip=`kubectl get ingress --field-selector metadata.name=url-shortener-backend --namespace url-shortener-backend -o custom-columns=:.status.loadBalancer.ingress[0].ip | tr -d '\n'`
 mapping="$ip    $domainName"
 
 text="The following resolution has to be written in /etc/hosts

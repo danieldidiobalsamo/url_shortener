@@ -4,8 +4,8 @@
 
 use actix_web::{get, http, web, App, HttpResponse, HttpServer, Responder};
 use std::sync::Mutex;
-use url_shortener::Config;
 use url_shortener_algo;
+use url_shortener_backend::Config;
 use url_shortener_redis_server::{self, RedisClient};
 
 mod security;
