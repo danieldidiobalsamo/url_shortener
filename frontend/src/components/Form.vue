@@ -1,11 +1,27 @@
 <script>
 export default {
-  props: {
-    msg: String
+  data(){
+    return{
+      urlToShorten: '',
+      fullUrl: ''
+    }
+  },
+
+  methods: {
+    shortUrl(){
+      console.log("shorten " + this.urlToShorten)
+      this.fullUrl = 'TODO'
+    }
   }
 }
 </script>
 
 <template>
-  <h1>{{ msg || 'test'}}</h1>
+  <form @submit.prevent="shortUrl">
+    <input type="text" placeholder="URL to shorten..." v-model="urlToShorten">
+    <button>Shorten</button>
+  </form>
+
+  <input type="text" :value='fullUrl'>
+
 </template>
