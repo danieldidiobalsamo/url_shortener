@@ -1,4 +1,4 @@
-namespace: url-shortener-backend
+namespace: url-shortener
 
 appSocket: "0.0.0.0:8080" # socket that app is listening on
 redisSocket: "redis-master:6379" # socket that redis is listening on
@@ -9,4 +9,4 @@ lets_encrypt_prod_mode: false
 
 cert-manager:
   installCRDs: false
-  namespace: url-shortener-backend
+  namespace: url-shortener
