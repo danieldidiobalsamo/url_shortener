@@ -2,6 +2,7 @@
 
 //! Application REST API
 
+use actix_cors::Cors;
 use actix_web::{get, http, web, App, HttpResponse, HttpServer, Responder};
 use std::sync::Mutex;
 use url_shortener_algo;
@@ -87,11 +88,16 @@ async fn main() -> std::io::Result<()> {
     let port = socket.1;
 
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allow_any_origin()
+            .allowed_methods(vec!["GET"]);
+
         App::new()
             .app_data(redis.clone())
             .service(index)
             .service(shorten_url_request)
             .service(retrieve_full_url)
+            .wrap(cors)
     })
     .bind((ip, port))?
     .run()

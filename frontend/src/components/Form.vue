@@ -9,10 +9,43 @@ export default {
 
   methods: {
     shortUrl(){
-      console.log("shorten " + this.urlToShorten)
-      this.fullUrl = 'TODO'
+      if(isUrl(this.urlToShorten)){
+        const server = "http://short.home.backend"
+        fetch(server + "/encode/" + encodeURIComponent(this.urlToShorten), {
+          method: "GET",
+          mode: "cors",
+          referrer: "no-referrer"
+        })
+        .then(res => {
+          if(res.ok){
+            return res.text()
+          }
+          else{
+            throw new Error("Received HTTP " + res.status + " " + res.statusText)
+          }
+        })
+        .then(res =>{
+          this.fullUrl = server + "/decode/" + res;
+        }).catch((err)=>{
+          alert(err)
+        })
+      }
+      else{
+        alert("Bad url")
+      }
     }
   }
+}
+
+function isUrl(input){
+  try{
+    new URL(input)
+  }
+  catch(err){
+    return false;
+  }
+
+  return true;
 }
 </script>
 
