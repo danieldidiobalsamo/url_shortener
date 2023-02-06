@@ -11,14 +11,6 @@ use url_shortener_redis_server::{self, RedisClient};
 
 mod security;
 
-/// Returns home page
-#[get("/")]
-async fn index() -> impl Responder {
-    HttpResponse::build(http::StatusCode::OK)
-        .content_type("text/html; charset=utf-8")
-        .body(include_str!("../static/index.html"))
-}
-
 /// Returns url corresponding key
 #[get("/encode/{url}")]
 async fn shorten_url_request(
@@ -94,7 +86,6 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .app_data(redis.clone())
-            .service(index)
             .service(shorten_url_request)
             .service(retrieve_full_url)
             .wrap(cors)
