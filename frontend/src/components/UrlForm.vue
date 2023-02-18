@@ -4,7 +4,7 @@
     <button>Shorten</button>
   </form>
 
-  <input type="text" :value='fullUrl'>
+  <input type="text" :value='shortenedUrl'>
 
 </template>
 
@@ -13,7 +13,7 @@ export default {
   data(){
     return{
       urlToShorten: '',
-      fullUrl: ''
+      shortenedUrl: ''
     }
   },
 
@@ -35,7 +35,7 @@ export default {
           }
         })
         .then(res =>{
-          this.fullUrl = server + "/decode/" + res;
+          this.shortenedUrl = server + "/decode/" + res;
         }).catch((err)=>{
           alert(err)
         })
