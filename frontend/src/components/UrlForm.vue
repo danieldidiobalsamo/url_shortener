@@ -1,3 +1,13 @@
+<template>
+  <form @submit.prevent="shortUrl">
+    <input type="text" placeholder="URL to shorten..." v-model="urlToShorten">
+    <button>Shorten</button>
+  </form>
+
+  <input type="text" :value='fullUrl'>
+
+</template>
+
 <script>
 export default {
   data(){
@@ -48,13 +58,3 @@ function isUrl(input){
   return true;
 }
 </script>
-
-<template>
-  <form @submit.prevent="shortUrl">
-    <input type="text" placeholder="URL to shorten..." v-model="urlToShorten">
-    <button>Shorten</button>
-  </form>
-
-  <input type="text" :value='fullUrl'>
-
-</template>

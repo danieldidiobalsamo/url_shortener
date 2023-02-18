@@ -1,7 +1,7 @@
 <script setup>
-import Form from './components/Form.vue'
+import UrlForm from './components/UrlForm.vue'
 </script>
 
 <template>
-  <Form />
+  <UrlForm />
 </template>
