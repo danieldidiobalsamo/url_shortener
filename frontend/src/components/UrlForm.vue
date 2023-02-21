@@ -1,17 +1,11 @@
 <template>
-  <header>
-    hello header
-  </header>
-  <main>
+  <div id="main-item">
     <form @submit.prevent="shortUrl">
         <input type="text" placeholder="URL to shorten..." v-model="urlToShorten">
         <button>Shorten</button>
     </form>
     <input type="text" :value='shortenedUrl'>
-  </main>
-  <footer>
-    hello footer
-  </footer>
+  </div>
 </template>
 
 <script>
@@ -66,31 +60,13 @@ function isUrl(input){
 </script>
 
 <style type="text/css">
-  *{
-    font-size: 20px;
-  }
-
-  body{
-    margin: 0;
-  }
-
-  main{
+  #main-item{
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     align-content: center;
     justify-content: center;
     height: 80vh;
-    width: 100vw;
-  }
-
-  header{
-    height: 10vh;
-    width: 100vw;
-  }
-
-  footer{
-    height: 10vh;
     width: 100vw;
   }
 </style>
