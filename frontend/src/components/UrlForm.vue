@@ -66,7 +66,7 @@ function isUrl(input){
     flex-wrap: wrap;
     align-content: center;
     justify-content: center;
-    height: 80vh;
+    height: 84vh;
     width: 100vw;
   }
 </style>
