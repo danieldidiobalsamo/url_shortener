@@ -1,10 +1,11 @@
 <template>
   <div id="main-item">
     <form id="url-form" @submit.prevent="shortUrl">
-      <input type="text" placeholder="URL to shorten..." v-model="urlToShorten">
-      <button>Shorten</button>
+      <input autofocus type="text" placeholder="URL to shorten..." v-model="urlToShorten">
+      <button disabled id="shorten-btn">Shorten</button>
     </form>
-    <input type="text" :value='shortenedUrl'>
+    <input type="text" :value='shortenedUrl' readonly>
+    <span id="invalid-msg-tooltip"> invalid url </span>
   </div>
 </template>
 
@@ -19,7 +20,6 @@ export default {
 
   methods: {
     shortUrl(){
-      if(isUrl(this.urlToShorten)){
         const server = "http://short.home.backend"
         fetch(server + "/encode/" + encodeURIComponent(this.urlToShorten), {
           method: "GET",
@@ -39,9 +39,28 @@ export default {
         }).catch((err)=>{
           alert(err)
         })
+    }
+  },
+
+  watch:{
+    urlToShorten(url){
+      let btn = document.getElementById("shorten-btn")
+      let tooltip = document.getElementById("invalid-msg-tooltip")
+
+      if(isUrl(url)){
+          btn.disabled = false;
+          btn.style.opacity= 1;
+          btn.style.cursor= "default";
+
+          tooltip.style.visibility = "hidden";
+
       }
       else{
-        alert("Bad url")
+          btn.disabled = true;
+          btn.style.opacity= 0.6;
+          btn.style.cursor= "not-allowed";
+
+          tooltip.style.visibility = "visible";
       }
     }
   }
@@ -80,7 +99,7 @@ function isUrl(input){
     column-gap: 5em;
   }
 
-  #main-item input, button{
+  #main-item input, button, span{
     background: #2480FF;
     color: white;
     border-radius: 5px;
@@ -100,9 +119,20 @@ function isUrl(input){
   #main-item button{
     width: 10em;
     height: 2em;
+
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   #main-item button:hover{
       background-color: #1D66CC;
   }
+
+  #invalid-msg-tooltip{
+    display: flex;
+    justify-content: center;
+    background-color: #ff9800;
+    visibility: hidden;
+  }
+
 </style>
