@@ -68,7 +68,11 @@ export default {
 
 function isUrl(input){
   try{
-    new URL(input)
+    const url = new URL(input)
+
+    if(url.protocol != "http:" && url.protocol != "https:"){
+      throw new Error("protocol must be http or https")
+    }
   }
   catch(err){
     return false;

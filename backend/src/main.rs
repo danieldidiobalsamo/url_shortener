@@ -21,21 +21,28 @@ async fn shorten_url_request(
     let mut redis = redis.lock().unwrap();
 
     if !security::is_url(&url) {
-        HttpResponse::build(http::StatusCode::BAD_REQUEST).body("Provided url is not valid")
-    } else {
-        let short = url_shortener_algo::encode_url(&url);
-        match redis.add_url::<String>(&short, &url) {
-            Ok(_) => HttpResponse::build(http::StatusCode::OK).body(short),
-            Err(err) => {
-                let msg = format!(
-                    "Can't set key/value on redis: {:?} {:?}",
-                    err.kind(),
-                    err.detail()
-                );
+        return HttpResponse::build(http::StatusCode::BAD_REQUEST)
+            .body("Provided url is not valid");
+    }
 
-                println!("{}", msg);
-                HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body("")
-            }
+    let protocol = url.split(':').collect::<Vec<&str>>()[0];
+    if protocol != "https" && protocol != "http" {
+        return HttpResponse::build(http::StatusCode::BAD_REQUEST)
+            .body("Only https and http are allowed");
+    }
+
+    let short = url_shortener_algo::encode_url(&url);
+    match redis.add_url::<String>(&short, &url) {
+        Ok(_) => HttpResponse::build(http::StatusCode::OK).body(short),
+        Err(err) => {
+            let msg = format!(
+                "Can't set key/value on redis: {:?} {:?}",
+                err.kind(),
+                err.detail()
+            );
+
+            println!("{}", msg);
+            HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body("")
         }
     }
 }
