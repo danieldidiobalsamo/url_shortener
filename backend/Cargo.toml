@@ -1,5 +1,5 @@
 [package]
-name = "url_shortener"
+name = "url_shortener_backend"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,3 +13,4 @@ url_shortener_redis_server = {path = "./url_shortener_redis_server", version="0.
 
 ammonia = "3.2.1"
 url = "2.3.1"
+actix-cors = "0.6.1"

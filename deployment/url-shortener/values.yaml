@@ -1,0 +1,7 @@
+namespace: url-shortener
+
+url-shortener-frontend:
+  applicationDomainName: "short.home"
+
+url-shortener-backend:
+  applicationDomainName: "short.home.backend"

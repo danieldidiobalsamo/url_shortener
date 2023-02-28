@@ -2,21 +2,14 @@
 
 //! Application REST API
 
+use actix_cors::Cors;
 use actix_web::{get, http, web, App, HttpResponse, HttpServer, Responder};
 use std::sync::Mutex;
-use url_shortener::Config;
 use url_shortener_algo;
+use url_shortener_backend::Config;
 use url_shortener_redis_server::{self, RedisClient};
 
 mod security;
-
-/// Returns home page
-#[get("/")]
-async fn index() -> impl Responder {
-    HttpResponse::build(http::StatusCode::OK)
-        .content_type("text/html; charset=utf-8")
-        .body(include_str!("../static/index.html"))
-}
 
 /// Returns url corresponding key
 #[get("/encode/{url}")]
@@ -28,21 +21,28 @@ async fn shorten_url_request(
     let mut redis = redis.lock().unwrap();
 
     if !security::is_url(&url) {
-        HttpResponse::build(http::StatusCode::BAD_REQUEST).body("Provided url is not valid")
-    } else {
-        let short = url_shortener_algo::encode_url(&url);
-        match redis.add_url::<String>(&short, &url) {
-            Ok(_) => HttpResponse::build(http::StatusCode::OK).body(short),
-            Err(err) => {
-                let msg = format!(
-                    "Can't set key/value on redis: {:?} {:?}",
-                    err.kind(),
-                    err.detail()
-                );
+        return HttpResponse::build(http::StatusCode::BAD_REQUEST)
+            .body("Provided url is not valid");
+    }
 
-                println!("{}", msg);
-                HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body("")
-            }
+    let protocol = url.split(':').collect::<Vec<&str>>()[0];
+    if protocol != "https" && protocol != "http" {
+        return HttpResponse::build(http::StatusCode::BAD_REQUEST)
+            .body("Only https and http are allowed");
+    }
+
+    let short = url_shortener_algo::encode_url(&url);
+    match redis.add_url::<String>(&short, &url) {
+        Ok(_) => HttpResponse::build(http::StatusCode::OK).body(short),
+        Err(err) => {
+            let msg = format!(
+                "Can't set key/value on redis: {:?} {:?}",
+                err.kind(),
+                err.detail()
+            );
+
+            println!("{}", msg);
+            HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body("")
         }
     }
 }
@@ -87,11 +87,15 @@ async fn main() -> std::io::Result<()> {
     let port = socket.1;
 
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allow_any_origin()
+            .allowed_methods(vec!["GET"]);
+
         App::new()
             .app_data(redis.clone())
-            .service(index)
             .service(shorten_url_request)
             .service(retrieve_full_url)
+            .wrap(cors)
     })
     .bind((ip, port))?
     .run()

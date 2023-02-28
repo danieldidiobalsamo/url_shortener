@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: url-shortener-backend
+  namespace: {{ .Values.namespace }}
+  name: url-shortener
+spec:
+  rules:
+  - host: {{ index .Values "url-shortener-frontend" "applicationDomainName" }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: url-shortener-frontend
+            port: 
+              number: 8080
+  - host: {{ index .Values "url-shortener-backend" "applicationDomainName" }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: url-shortener-backend
+            port: 
+              number: 8080

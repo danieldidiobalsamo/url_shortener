@@ -2,7 +2,6 @@ namespace: url-shortener
 
 appSocket: "0.0.0.0:8080" # socket that app is listening on
 redisSocket: "redis-master:6379" # socket that redis is listening on
-applicationDomainName: short.home # url to reach app : https://<applicationDomainName>
 
 # this should be turned off for dev, so that staging server is used instead (prod server has very strict rate limits) 
 lets_encrypt_prod_mode: false

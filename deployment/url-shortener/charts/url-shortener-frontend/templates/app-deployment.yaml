@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: url-shortener-frontend
+  namespace: {{ .Values.namespace }}
+  labels: 
+    app: url-shortener-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: url-shortener-frontend
+  template:
+    metadata:
+      labels:
+        app: url-shortener-frontend
+    spec:
+      containers:
+        - name: url-shortener-frontend
+          image: docker.io/library/url-shortener-frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080

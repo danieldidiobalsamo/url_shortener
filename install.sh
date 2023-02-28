@@ -14,14 +14,12 @@ domainName=$(whiptail --title "url-shortener installation" --inputbox "$text" 16
 
 # deploy app
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
-helm install url-shortener deployment/rust-url-shortener \
-  --set applicationDomainName=$domainName \
-  --wait
-echo -e 'Done.\n'
+helm install url-shortener deployment/url-shortener --wait
 
 # add ingress IP to /etc/hosts
 ip=`kubectl get ingress --field-selector metadata.name=url-shortener --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip | tr -d '\n'`
-mapping="$ip    $domainName"
+mapping="$ip    $domainName
+$ip    $domainName.backend"
 
 text="The following resolution has to be written in /etc/hosts
 
@@ -37,9 +35,9 @@ if (whiptail --title "url-shortener installation" --yesno "$text" 16 60) then
   echo "$mapping" | cat - /etc/hosts > /tmp/hosts_tmp && sudo mv /tmp/hosts_tmp /etc/hosts
 
   echo -e '(10/10) Application is deployed !'
-  echo -e "Open this link : https://$domainName"
+  echo -e "Open this link : http://$domainName"
 else
   echo "Please manually paste this line in /etc/hosts:"
   echo -e "$mapping\n"
-  echo -e "Then Open this link : https://$domainName"
+  echo -e "Then Open this link : http://$domainName"
 fi
