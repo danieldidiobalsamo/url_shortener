@@ -14,23 +14,26 @@ ip=`kubectl get ingress --field-selector metadata.name=url-shortener --namespace
 mapping="$ip    $domainName
 $ip    $domainName.backend"
 
-text="The following resolution has to be written in /etc/hosts
+text="The following resolution has to be written in /etc/hosts, or manually be configured in your internal DNS :
 
 $mapping
 
-If you prefer to do it manually, please add this line in /etc/hosts
 
-Continue ?
+Update /etc/hosts ?
 "
 
-if (whiptail --title "url-shortener installation" --yesno "$text" 16 60) then
-  echo "need sudo to write in /etc/hosts:"
+if (whiptail --title "url-shortener installation" --yesno "$text" 16 80) then
+  echo "need permission to write in /etc/hosts:"
   echo "$mapping" | cat - /etc/hosts > /tmp/hosts_tmp && sudo mv /tmp/hosts_tmp /etc/hosts
 
-  echo -e '(10/10) Application is deployed !'
+  echo -e '================================================================================='
+  echo -e 'Application is deployed !'
   echo -e "Open this link : http://$domainName"
+  echo -e '================================================================================='
 else
-  echo "Please manually paste this line in /etc/hosts:"
+  echo -e '================================================================================='
+  echo "Please manually configure your internal DNS with the following :"
   echo -e "$mapping\n"
   echo -e "Then Open this link : http://$domainName"
+  echo -e '================================================================================='
 fi
