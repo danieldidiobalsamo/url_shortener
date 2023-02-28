@@ -3,20 +3,13 @@
 echo -e 'Downloading cert-manager CRDs...\n'
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml
 
-# let user choose the application domain name
-text="
-Please choose url-shortener application domain name.
-
-Note: if a private domain name is provided, a 'Kubernetes Ingress Controller Fake Certificate' is issued. Otherwise let's encrypt issues one.
-"
-
-domainName=$(whiptail --title "url-shortener installation" --inputbox "$text" 16 60 short.home 3>&1 1>&2 2>&3)
-
 # deploy app
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
 helm install url-shortener deployment/url-shortener --wait
 
 # add ingress IP to /etc/hosts
+domainName="short.home"
+
 ip=`kubectl get ingress --field-selector metadata.name=url-shortener --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip | tr -d '\n'`
 mapping="$ip    $domainName
 $ip    $domainName.backend"
