@@ -26,3 +26,9 @@ spec:
               value: {{ .Values.appSocket }}
             - name: REDIS_SOCKET
               value: {{ .Values.redisSocket }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 3
