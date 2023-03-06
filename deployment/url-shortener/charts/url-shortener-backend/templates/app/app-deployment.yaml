@@ -32,3 +32,9 @@ spec:
               port: 8080
             initialDelaySeconds: 15
             periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /encode/https%3A%2F%2Fwww.rust-lang.org%2F
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 3
