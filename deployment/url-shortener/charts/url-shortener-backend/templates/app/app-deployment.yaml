@@ -36,5 +36,10 @@ spec:
             httpGet:
               path: /encode/https%3A%2F%2Fwww.rust-lang.org%2F
               port: 8080
-            initialDelaySeconds: 15
+            periodSeconds: 3
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 10
             periodSeconds: 3
