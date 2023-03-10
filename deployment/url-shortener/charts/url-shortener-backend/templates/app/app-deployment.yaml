@@ -10,6 +10,14 @@ spec:
   selector:
     matchLabels:
       app: url-shortener-backend
+  revisionHistoryLimit: 5
+  progressDeadlineSeconds: 120
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   template:
     metadata:
       labels:
