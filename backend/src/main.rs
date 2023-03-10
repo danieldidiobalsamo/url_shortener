@@ -74,6 +74,12 @@ async fn retrieve_full_url(
     }
 }
 
+/// Reply kubernetes liveness probe
+#[get("/health")]
+async fn health() -> impl Responder {
+    HttpResponse::build(http::StatusCode::OK)
+}
+
 /// Setup actix server
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -95,6 +101,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(redis.clone())
             .service(shorten_url_request)
             .service(retrieve_full_url)
+            .service(health)
             .wrap(cors)
     })
     .bind((ip, port))?

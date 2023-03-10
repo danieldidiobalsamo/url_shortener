@@ -6,10 +6,18 @@ metadata:
   labels: 
     app: url-shortener-backend
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: url-shortener-backend
+  revisionHistoryLimit: 5
+  progressDeadlineSeconds: 120
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   template:
     metadata:
       labels:
@@ -26,3 +34,20 @@ spec:
               value: {{ .Values.appSocket }}
             - name: REDIS_SOCKET
               value: {{ .Values.redisSocket }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /encode/https%3A%2F%2Fwww.rust-lang.org%2F
+              port: 8080
+            periodSeconds: 3
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 10
+            periodSeconds: 3
