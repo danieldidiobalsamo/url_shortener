@@ -7,10 +7,21 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
 helm install url-shortener deployment/url-shortener --wait
 
+# helm install --wait doesn't wait for ingress to get an IP
+function getIngressIP () {
+  ip=`kubectl get ingress --field-selector metadata.name=url-shortener --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip | tr -d '\n'`
+  echo $ip
+}
+
+ip=$( getIngressIP )
+until [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]
+do
+  ip=$( getIngressIP )
+done
+
 # add ingress IP to /etc/hosts
 domainName="short.home"
 
-ip=`kubectl get ingress --field-selector metadata.name=url-shortener --namespace url-shortener -o custom-columns=:.status.loadBalancer.ingress[0].ip | tr -d '\n'`
 mapping="$ip    $domainName
 $ip    $domainName.backend"
 
