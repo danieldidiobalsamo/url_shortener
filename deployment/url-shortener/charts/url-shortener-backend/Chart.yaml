@@ -11,7 +11,3 @@ home: https://github.com/danieldidiobalsamo/url_shortener
 sources:
   - https://github.com/danieldidiobalsamo/url_shortener
 appVersion: "1.16.0"
-dependencies:
-- name: cert-manager
-  version: "1.9.1"
-  repository: "https://charts.jetstack.io"
