@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-echo -e 'Downloading cert-manager CRDs...\n'
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml
-
 # deploy app
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
 helm install url-shortener deployment/url-shortener --wait

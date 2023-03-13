@@ -1,14 +1,14 @@
 # How to launch
 ## If you have a kubernetes cluster
 
-Launch `install.sh` script, which will deploy application in a separate namespace, and install cert-manager.
+To install the chart and update your /etc/hosts file automatically, just launch :
 
 ~~~
 sudo chmod +x install.sh
 ./install.sh
 ~~~
 
-Then open https://url-shortener-rust.com
+Then open http://short.home/
 
 ## If you don't have a kubernetes cluster
 
@@ -23,14 +23,14 @@ minikube start
 minikube addons enable ingress
 ~~~
 
-Then launch `install.sh` script, which will deploy application in a separate namespace, and install cert-manager.
+To install the chart and update your /etc/hosts file automatically, just launch :
 
 ~~~
 sudo chmod +x install.sh
 ./install.sh
 ~~~
 
-You can now open https://url-shortener-rust.com
+You can now open http://short.home/
 
 # How to uninstall
 
