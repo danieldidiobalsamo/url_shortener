@@ -5,9 +5,11 @@
 use actix_cors::Cors;
 use actix_web::{get, http, web, App, HttpResponse, HttpServer, Responder};
 use std::sync::Mutex;
-use url_shortener_algo;
+
+// workspace packages
+use url_shortener_algo as algo;
 use url_shortener_backend::Config;
-use url_shortener_redis_server::{self, RedisClient};
+use url_shortener_redis::{self, RedisClient};
 
 mod security;
 
@@ -31,7 +33,7 @@ async fn shorten_url_request(
             .body("Only https and http are allowed");
     }
 
-    let short = url_shortener_algo::encode_url(&url);
+    let short = algo::encode_url(&url);
     match redis.add_url::<String>(&short, &url) {
         Ok(_) => HttpResponse::build(http::StatusCode::OK).body(short),
         Err(err) => {
