@@ -2,10 +2,9 @@
 
 FROM rust:latest as builder
 
-RUN mkdir url_shortener_backend
-WORKDIR ./url_shortener_backend
+WORKDIR /app
 COPY . .
-RUN cargo install --path .
+RUN cargo build --release
 
 FROM debian:buster-slim
 
@@ -13,7 +12,7 @@ FROM debian:buster-slim
 RUN useradd -ms /bin/bash url_shortener_backend
 USER url_shortener_backend
 
-COPY --from=builder /usr/local/cargo/bin/url_shortener_backend /usr/local/bin/url_shortener_backend
+COPY --from=builder /app/target/release/url_shortener_backend /usr/local/bin/url_shortener_backend
 
 ENTRYPOINT url_shortener_backend
 EXPOSE 8080
