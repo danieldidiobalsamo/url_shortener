@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-sts
+  namespace: url-shortener-redis
+spec:
+  serviceName: "redis-write"
+  selector:
+    matchLabels:
+      app: redis-sts
+  replicas: 6
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: redis-sts
+    spec:
+      containers:
+      - name: redis
+        image: redis:7.0
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /mnt
+        command:
+          - bash
+          - -c
+          - /mnt/update-node.sh && redis-server /mnt/redis.conf #&& /mnt/createCluster.sh
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      volumes:
+      - name: config
+        configMap:
+          name: redis-config
+          defaultMode: 0777
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
