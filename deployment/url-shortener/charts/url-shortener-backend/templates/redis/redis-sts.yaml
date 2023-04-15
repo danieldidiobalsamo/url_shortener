@@ -29,12 +29,7 @@ spec:
         command:
           - bash
           - -c
-          - /mnt/update-node.sh && redis-server /mnt/redis.conf
-        env:
-        - name: POD_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
+          - redis-server /mnt/redis.conf
       volumes:
       - name: config
         configMap:

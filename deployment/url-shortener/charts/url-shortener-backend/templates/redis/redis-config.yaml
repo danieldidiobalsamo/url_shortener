@@ -17,8 +17,3 @@ data:
     appendfilename "appendonly.aof"
     cluster-config-file /data/nodes.conf 
     protected-mode no
-
-  update-node.sh: |
-    #!/bin/bash
-    sed -i -e "/myself/ s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${POD_IP}/" /data/nodes.conf
-    exec "$@"
