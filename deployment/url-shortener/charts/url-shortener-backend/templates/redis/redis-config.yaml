@@ -22,25 +22,3 @@ data:
     #!/bin/bash
     sed -i -e "/myself/ s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${POD_IP}/" /data/nodes.conf
     exec "$@"
-
-  createCluster.sh: |
-    #!/bin/bash
-
-    echo "createCluster.sh=========================="
-
-    if [[ "$HOSTNAME" == "redis-sts-0" ]]; then
-      echo "CREATE CLUSTER=========================="
-
-      nbReplicasTarget=$(kubectl get sts redis-sts -o custom-columns=:.spec.replicas)
-      
-      availableReplicas=$(kubectl get sts redis-sts -o custom-columns=:.spec.replicas)
-
-      until $nbReplicasTarget -ne $availableReplicas
-      do
-        availableReplicas=$(kubectl get sts redis-sts -o custom-columns=:.spec.replicas)
-      done
-
-      pods_ips=$(kubectl get pods -n -l app=redis-sts -o jsonpath='{range.items[*]}{.status.podIP}:6379')
-      redis-cli --cluster create --cluster-replicas $pods_ips
-
-    fi

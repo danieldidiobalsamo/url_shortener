@@ -29,7 +29,7 @@ spec:
         command:
           - bash
           - -c
-          - /mnt/update-node.sh && redis-server /mnt/redis.conf #&& /mnt/createCluster.sh
+          - /mnt/update-node.sh && redis-server /mnt/redis.conf
         env:
         - name: POD_IP
           valueFrom:

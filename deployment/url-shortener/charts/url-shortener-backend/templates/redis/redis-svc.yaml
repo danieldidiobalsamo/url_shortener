@@ -3,7 +3,7 @@ kind: Service
 metadata:
   labels:
     app: redis-sts
-  name: redis-write
+  name: redis
   namespace: url-shortener-redis
 spec:
   clusterIP: None
@@ -11,20 +11,3 @@ spec:
   - port: 6379
   selector:
     app: redis-sts
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: redis-sts
-  name: redis-read
-  namespace: url-shortener-redis
-spec:
-  ports:
-  - port: 6379
-    protocol: TCP
-    targetPort: 6379
-  selector:
-    app: redis-sts
-  sessionAffinity: None
-  type: ClusterIP
