@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
+######################################################################
+# url-shortener-redis chart installation and cluster setup
+######################################################################
+
 # deploy app
-echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
-helm install url-shortener deployment/url-shortener --wait
+echo -e 'Setup url-shortener redis cluster...\n'
+helm install url-shortener-redis deployment/url-shortener-redis \
+  --namespace url-shortener-redis --create-namespace \
+  --wait
 
 # call redis-cli into redis-sts-0 to create cluster shards
 echo -e 'Setup redis cluster shards...\n'
@@ -19,6 +25,12 @@ done
 pods_ips=$(kubectl get pods -l app=redis-sts -o jsonpath='{range.items[*]} {.status.podIP}:6379{end}' -n url-shortener-redis)
 kubectl exec redis-sts-0 -n url-shortener-redis -- redis-cli --cluster create --cluster-replicas 1 $pods_ips --cluster-yes
 
+######################################################################
+# url-shortener chart installation and /etc/hosts update
+######################################################################
+
+echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
+helm install url-shortener deployment/url-shortener --wait
 
 # helm install --wait doesn't wait for ingress to get an IP
 function getIngressIP () {

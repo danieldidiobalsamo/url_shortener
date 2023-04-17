@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redis-sts
-  namespace: url-shortener-redis
+  namespace: {{ .Values.namespace }}
 spec:
   serviceName: "redis-write"
   selector:

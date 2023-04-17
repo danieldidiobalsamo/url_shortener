@@ -1,0 +1,1 @@
+If you installed this chart without using install.sh script, please clone the following repository and follow readme instructions : https://github.com/danieldidiobalsamo/url_shortener
