@@ -28,7 +28,8 @@ kubectl exec redis-sts-0 -n url-shortener-redis -- redis-cli --cluster create --
 ######################################################################
 
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
-helm install url-shortener deployment/url-shortener --wait
+helm install url-shortener deployment/url-shortener \
+  --namespace url-shortener --create-namespace
 
 # helm install --wait doesn't wait for ingress to get an IP
 function getIngressIP () {
