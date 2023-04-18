@@ -7,19 +7,17 @@
 # deploy app
 echo -e 'Setup url-shortener redis cluster...\n'
 helm install url-shortener-redis deployment/url-shortener-redis \
-  --namespace url-shortener-redis --create-namespace \
-  --wait
+  --namespace url-shortener-redis --create-namespace
 
 # call redis-cli into redis-sts-0 to create cluster shards
 echo -e 'Setup redis cluster shards...\n'
 
 nbReplicasTarget=$(kubectl get sts redis-sts -o custom-columns=:.spec.replicas -n url-shortener-redis)
-availableReplicas=$(kubectl get sts redis-sts -o custom-columns=:.spec.replicas -n url-shortener-redis)
+availableReplicas=$(kubectl get sts redis-sts -o custom-columns=:.status.availableReplicas -n url-shortener-redis)
 
 until [[ $nbReplicasTarget -eq $availableReplicas && $availableReplicas -ne 0 ]]
 do
-  echo $availableReplicas / $nbReplicasTarget
-  availableReplicas=$(kubectl get sts redis-sts -o custom-columns=:.spec.replicas -n url-shortener-redis)
+  availableReplicas=$(kubectl get sts redis-sts -o custom-columns=:.status.availableReplicas -n url-shortener-redis)
 done
 
 pods_ips=$(kubectl get pods -l app=redis-sts -o jsonpath='{range.items[*]} {.status.podIP}:6379{end}' -n url-shortener-redis)
