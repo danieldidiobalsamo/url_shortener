@@ -1,4 +1,4 @@
 namespace: url-shortener
 
 appSocket: "0.0.0.0:8080" # socket that app is listening on
-redisSocket: "redis.url-shortener-redis.svc.cluster.local:6379"
+redisSocket: "redis-sts-0.redis-write.url-shortener-redis.svc.cluster.local:6379"

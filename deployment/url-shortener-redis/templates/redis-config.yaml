@@ -6,14 +6,16 @@ metadata:
   labels:
     app: redis
 data:
-  redis.conf: |
-    cluster-enabled yes
-    bind 0.0.0.0
-    port 6379
 
+  launch.sh: |
+
+    if [[ $HOSTNAME == "redis-sts-0" ]]; then
+      redis-server /mnt/master.conf
+    else
+      redis-server --replicaof redis-sts-0.redis-write.url-shortener-redis.svc.cluster.local 6379
+    fi
+
+  master.conf: |
     dir /data
-    dbfilename dump.rdb
-    appendonly yes
-    appendfilename "appendonly.aof"
-    cluster-config-file /data/nodes.conf 
+    cluster-config-file /data/nodes.conf
     protected-mode no

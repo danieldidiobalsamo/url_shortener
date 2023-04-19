@@ -29,7 +29,7 @@ spec:
         command:
           - bash
           - -c
-          - redis-server /mnt/redis.conf
+          - /mnt/launch.sh
       volumes:
       - name: config
         configMap:
