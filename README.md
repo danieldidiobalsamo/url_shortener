@@ -12,3 +12,12 @@ I strongly recommend to use the install script since it setups everything for yo
 sudo chmod +x install.sh
 ./install.sh
 ~~~
+
+# How to uninstall
+
+The following script removes the charts, scales down and removes the redis statefulset (including the datas) and the hostname in /etc/hosts :
+
+~~~
+sudo chmod +x uninstall.sh
+./uninstall.sh
+~~~
