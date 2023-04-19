@@ -30,10 +30,12 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: REDIS_RO_ENDPOINT
+              value: {{ .Values.redisROEndpoint }}
+            - name: REDIS_RW_ENDPOINT
+              value: {{ .Values.redisRWEndpoint }}
             - name: APP_SOCKET
               value: {{ .Values.appSocket }}
-            - name: REDIS_SOCKET
-              value: {{ .Values.redisSocket }}
           livenessProbe:
             httpGet:
               path: /health

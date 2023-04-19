@@ -6,32 +6,34 @@ use redis::{Commands, Connection, FromRedisValue, RedisResult};
 
 /// A struct that implements all necessary methods to interact with redis server
 pub struct RedisClient {
-    connection: Connection,
+    ro_connection: Connection, // read only connection to cluster (leader and followers)
+    rw_connection: Connection, // read write connection to cluster leader
 }
 
 impl RedisClient {
     /// Makes a connection with redis://{ip}:{port}
-    pub fn new(socket: &str) -> Result<RedisClient, String> {
-        let url = format!("redis://{}", socket);
-
-        let client =
-            redis::Client::open(url.clone()).unwrap_or_else(|_| panic!("Bad url: {}", url));
-
-        match client.get_connection() {
-            Ok(connection) => Ok(RedisClient {
-                connection: connection,
-            }),
-            Err(err) => {
-                let msg = String::from("Can't create connection with redis server at '{url}'");
-                Err(format!(
-                    "{}\n{:?} : {:?} {:?}",
-                    msg,
-                    err.category(),
-                    err.kind(),
-                    err.detail()
-                ))
-            }
+    pub fn new(ro_endpoint: &str, rw_endpoint: &str) -> RedisClient {
+        RedisClient {
+            ro_connection: RedisClient::create_connection(ro_endpoint),
+            rw_connection: RedisClient::create_connection(rw_endpoint),
         }
+    }
+
+    fn create_connection(endpoint: &str) -> Connection {
+        let client = redis::Client::open(format!("redis://{}", endpoint.clone()))
+            .unwrap_or_else(|_| panic!("Bad url: {}", endpoint));
+
+        client.get_connection().unwrap_or_else(|err| {
+            let msg = format!("Can't create connection with redis server at '{endpoint}'");
+            let msg = format!(
+                "{}\n{:?} : {:?} {:?}",
+                msg,
+                err.category(),
+                err.kind(),
+                err.detail()
+            );
+            panic!("{msg}");
+        })
     }
 
     /// Performs "set <short_url> <full_url>"
@@ -40,12 +42,12 @@ impl RedisClient {
         short_url: &str,
         full_url: &str,
     ) -> RedisResult<T> {
-        self.connection.set(short_url, full_url)
+        self.rw_connection.set(short_url, full_url)
     }
 
     /// Performs "get <short_url>" and returns full url
     pub fn get_full_url<T: FromRedisValue>(&mut self, short_url: &str) -> RedisResult<T> {
-        self.connection.get(short_url)
+        self.ro_connection.get(short_url)
     }
 }
 

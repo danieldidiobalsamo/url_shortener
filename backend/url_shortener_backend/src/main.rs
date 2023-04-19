@@ -87,7 +87,7 @@ async fn health() -> impl Responder {
 async fn main() -> std::io::Result<()> {
     let conf = Config::new();
 
-    let redis = RedisClient::new(&conf.redis_socket).unwrap();
+    let redis = RedisClient::new(&conf.redis_ro_endpoint, &conf.redis_rw_endpoint);
     let redis = web::Data::new(Mutex::new(redis));
 
     let socket = conf.split_app_socket();

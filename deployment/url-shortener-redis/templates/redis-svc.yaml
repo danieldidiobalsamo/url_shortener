@@ -12,7 +12,7 @@ spec:
     protocol: TCP
     targetPort: 6379
   selector:
-    app: redis
+    app: redis-sts
   sessionAffinity: None
   type: ClusterIP
 
