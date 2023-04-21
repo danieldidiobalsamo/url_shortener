@@ -26,6 +26,9 @@ spec:
           mountPath: /data
         - name: config
           mountPath: /mnt
+        - name: redis-passwd
+          readOnly: true
+          mountPath: "/etc/redis-passwd"
         command:
           - bash
           - -c
@@ -35,6 +38,9 @@ spec:
         configMap:
           name: redis-config
           defaultMode: 0777
+      - name: redis-passwd
+        secret:
+          secretName: redis-passwd
   volumeClaimTemplates:
   - metadata:
       name: data

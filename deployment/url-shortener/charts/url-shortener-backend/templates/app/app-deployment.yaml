@@ -29,6 +29,10 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: redis-passwd
+              readOnly: true
+              mountPath: "/etc/redis-passwd"
           env:
             - name: REDIS_RO_ENDPOINT
               value: {{ .Values.redisROEndpoint }}
@@ -53,3 +57,7 @@ spec:
               port: 8080
             failureThreshold: 10
             periodSeconds: 3
+      volumes:
+      - name: redis-passwd
+        secret:
+          secretName: redis-passwd

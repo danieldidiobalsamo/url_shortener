@@ -9,13 +9,15 @@ data:
 
   launch.sh: |
 
+    PASSWORD=$(cat /etc/redis-passwd/passwd)
+
     if [[ $HOSTNAME == "redis-sts-0" ]]; then
-      redis-server /mnt/master.conf
+      redis-server /mnt/master.conf --requirepass $PASSWORD
     else
-      redis-server --replicaof redis-sts-0.redis-write.url-shortener-redis.svc.cluster.local 6379
+      redis-server --replicaof redis-sts-0.redis-write.{{ .Values.namespace }}.svc.cluster.local 6379 \
+                   --masterauth $PASSWORD --requirepass $PASSWORD
     fi
 
   master.conf: |
     dir /data
     cluster-config-file /data/nodes.conf
-    protected-mode no

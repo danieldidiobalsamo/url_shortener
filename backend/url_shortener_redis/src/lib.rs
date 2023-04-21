@@ -12,26 +12,30 @@ pub struct RedisClient {
 
 impl RedisClient {
     /// Makes a connection with redis://{ip}:{port}
-    pub fn new(ro_endpoint: &str, rw_endpoint: &str) -> RedisClient {
+    pub fn new(
+        ro_endpoint: &str,
+        rw_endpoint: &str,
+        username: &str,
+        password: &str,
+    ) -> RedisClient {
         RedisClient {
-            ro_connection: RedisClient::create_connection(ro_endpoint),
-            rw_connection: RedisClient::create_connection(rw_endpoint),
+            ro_connection: RedisClient::create_connection(ro_endpoint, username, password),
+            rw_connection: RedisClient::create_connection(rw_endpoint, username, password),
         }
     }
 
-    fn create_connection(endpoint: &str) -> Connection {
-        let client = redis::Client::open(format!("redis://{}", endpoint.clone()))
-            .unwrap_or_else(|_| panic!("Bad url: {}", endpoint));
+    fn create_connection(endpoint: &str, username: &str, password: &str) -> Connection {
+        let url = format!("redis://{}:{}@{}", username, password, endpoint);
+
+        let client = redis::Client::open(url.clone()).unwrap_or_else(|err| {
+            let msg = format!("Redis connection issue: {url}");
+            let msg = format!("{}\n{:?}:{:?}", msg, err.category(), err);
+            panic!("{msg}");
+        });
 
         client.get_connection().unwrap_or_else(|err| {
-            let msg = format!("Can't create connection with redis server at '{endpoint}'");
-            let msg = format!(
-                "{}\n{:?} : {:?} {:?}",
-                msg,
-                err.category(),
-                err.kind(),
-                err.detail()
-            );
+            let msg = format!("Can't create connection with redis server at '{url}'");
+            let msg = format!("{}\n{:?}:{:?}", msg, err.category(), err);
             panic!("{msg}");
         })
     }

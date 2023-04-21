@@ -4,10 +4,14 @@
 # url-shortener-redis chart installation and cluster setup
 ######################################################################
 
+# generate password for redis
+kubectl create ns url-shortener
+kubectl create secret generic redis-passwd --from-literal=passwd=`openssl rand -hex 60` -n url-shortener
+
 # deploy app
 echo -e 'Setup url-shortener redis cluster...\n'
 helm install url-shortener-redis deployment/url-shortener-redis \
-  --namespace url-shortener-redis --create-namespace
+  --namespace url-shortener
 
 ######################################################################
 # url-shortener chart installation and /etc/hosts update
@@ -15,7 +19,7 @@ helm install url-shortener-redis deployment/url-shortener-redis \
 
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
 helm install url-shortener deployment/url-shortener \
-  --namespace url-shortener --create-namespace
+  --namespace url-shortener
 
 # helm install --wait doesn't wait for ingress to get an IP
 function getIngressIP () {
