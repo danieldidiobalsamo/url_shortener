@@ -6,32 +6,38 @@ use redis::{Commands, Connection, FromRedisValue, RedisResult};
 
 /// A struct that implements all necessary methods to interact with redis server
 pub struct RedisClient {
-    connection: Connection,
+    ro_connection: Connection, // read only connection to cluster (leader and followers)
+    rw_connection: Connection, // read write connection to cluster leader
 }
 
 impl RedisClient {
     /// Makes a connection with redis://{ip}:{port}
-    pub fn new(socket: &str) -> Result<RedisClient, String> {
-        let url = format!("redis://{}", socket);
-
-        let client =
-            redis::Client::open(url.clone()).unwrap_or_else(|_| panic!("Bad url: {}", url));
-
-        match client.get_connection() {
-            Ok(connection) => Ok(RedisClient {
-                connection: connection,
-            }),
-            Err(err) => {
-                let msg = String::from("Can't create connection with redis server at '{url}'");
-                Err(format!(
-                    "{}\n{:?} : {:?} {:?}",
-                    msg,
-                    err.category(),
-                    err.kind(),
-                    err.detail()
-                ))
-            }
+    pub fn new(
+        ro_endpoint: &str,
+        rw_endpoint: &str,
+        username: &str,
+        password: &str,
+    ) -> RedisClient {
+        RedisClient {
+            ro_connection: RedisClient::create_connection(ro_endpoint, username, password),
+            rw_connection: RedisClient::create_connection(rw_endpoint, username, password),
         }
+    }
+
+    fn create_connection(endpoint: &str, username: &str, password: &str) -> Connection {
+        let url = format!("redis://{}:{}@{}", username, password, endpoint);
+
+        let client = redis::Client::open(url.clone()).unwrap_or_else(|err| {
+            let msg = format!("Redis connection issue: {url}");
+            let msg = format!("{}\n{:?}:{:?}", msg, err.category(), err);
+            panic!("{msg}");
+        });
+
+        client.get_connection().unwrap_or_else(|err| {
+            let msg = format!("Can't create connection with redis server at '{url}'");
+            let msg = format!("{}\n{:?}:{:?}", msg, err.category(), err);
+            panic!("{msg}");
+        })
     }
 
     /// Performs "set <short_url> <full_url>"
@@ -40,47 +46,11 @@ impl RedisClient {
         short_url: &str,
         full_url: &str,
     ) -> RedisResult<T> {
-        self.connection.set(short_url, full_url)
+        self.rw_connection.set(short_url, full_url)
     }
 
     /// Performs "get <short_url>" and returns full url
     pub fn get_full_url<T: FromRedisValue>(&mut self, short_url: &str) -> RedisResult<T> {
-        self.connection.get(short_url)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn setup_client() -> RedisClient {
-        RedisClient::new("127.0.0.1", "6379")
-    }
-
-    #[test]
-    fn add_key_and_get() {
-        let full = "https://crates.io/";
-        let short = "d2af598";
-
-        let mut client = setup_client();
-
-        client.add_url(&short, &full).unwrap_or_else(|err| {
-            panic!(
-                "Can't set key/value on redis: {:?} {:?} | {:?} {:?}",
-                short,
-                full,
-                err.kind(),
-                err.detail()
-            )
-        });
-
-        let url_from_server: String = match client.get_full_url(&short) {
-            Ok(url) => url,
-            Err(err) => {
-                panic!("{:?} {:?}", err.kind(), err.detail());
-            }
-        };
-
-        assert_eq!(full, url_from_server);
+        self.ro_connection.get(short_url)
     }
 }

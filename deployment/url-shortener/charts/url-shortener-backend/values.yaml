@@ -1,4 +1,5 @@
 namespace: url-shortener
 
 appSocket: "0.0.0.0:8080" # socket that app is listening on
-redisSocket: "redis-master:6379" # socket that redis is listening on
+redisRWEndpoint: "redis-sts-0.redis-write.url-shortener.svc.cluster.local:6379"
+redisROEndpoint: "redis.url-shortener.svc.cluster.local:6379"
