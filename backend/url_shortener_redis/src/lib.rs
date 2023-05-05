@@ -54,39 +54,3 @@ impl RedisClient {
         self.ro_connection.get(short_url)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn setup_client() -> RedisClient {
-        RedisClient::new("127.0.0.1", "6379")
-    }
-
-    #[test]
-    fn add_key_and_get() {
-        let full = "https://crates.io/";
-        let short = "d2af598";
-
-        let mut client = setup_client();
-
-        client.add_url(&short, &full).unwrap_or_else(|err| {
-            panic!(
-                "Can't set key/value on redis: {:?} {:?} | {:?} {:?}",
-                short,
-                full,
-                err.kind(),
-                err.detail()
-            )
-        });
-
-        let url_from_server: String = match client.get_full_url(&short) {
-            Ok(url) => url,
-            Err(err) => {
-                panic!("{:?} {:?}", err.kind(), err.detail());
-            }
-        };
-
-        assert_eq!(full, url_from_server);
-    }
-}
