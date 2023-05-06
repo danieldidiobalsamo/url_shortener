@@ -23,6 +23,7 @@ spec:
       labels:
         app: url-shortener-backend
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: url-shortener-backend
           image: docker.io/library/url-shortener-backend:latest

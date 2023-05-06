@@ -15,6 +15,7 @@ spec:
       labels:
         app: url-shortener-frontend
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: url-shortener-frontend
           image: docker.io/library/url-shortener-frontend:latest

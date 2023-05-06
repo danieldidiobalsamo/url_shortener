@@ -15,6 +15,7 @@ spec:
       labels:
         app: redis-sts
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: redis
         image: redis:7.0
