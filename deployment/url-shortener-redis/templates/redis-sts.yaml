@@ -16,6 +16,8 @@ spec:
         app: redis-sts
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 1000
       containers:
       - name: redis
         image: redis:7.0
@@ -25,11 +27,17 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
+          readOnly: false
         - name: config
+          readOnly: true
           mountPath: /mnt
         - name: redis-passwd
           readOnly: true
           mountPath: "/etc/redis-passwd"
+        securityContext:
+          runAsUser: 2000
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
         command:
           - bash
           - -c

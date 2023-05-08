@@ -24,6 +24,8 @@ spec:
         app: url-shortener-backend
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 1000
       containers:
         - name: url-shortener-backend
           image: docker.io/library/url-shortener-backend:latest
@@ -41,6 +43,10 @@ spec:
               value: {{ .Values.redisRWEndpoint }}
             - name: APP_SOCKET
               value: {{ .Values.appSocket }}
+          securityContext:
+            runAsUser: 2000
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
           livenessProbe:
             httpGet:
               path: /health
