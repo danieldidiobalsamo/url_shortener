@@ -15,9 +15,22 @@ spec:
       labels:
         app: url-shortener-frontend
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: url-shortener-frontend
           image: docker.io/library/url-shortener-frontend:latest
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
+          resources:
+            requests:
+              cpu: "3m"
+              memory: "16Mi"
+            limits:
+              cpu: "10m"
+              memory: "25Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+              add: ["CAP_CHOWN", "CAP_SETGID", "CAP_SETUID"]
