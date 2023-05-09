@@ -24,3 +24,6 @@ spec:
             - containerPort: 8080
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+              add: ["CAP_CHOWN", "CAP_SETGID", "CAP_SETUID"]

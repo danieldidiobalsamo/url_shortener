@@ -38,6 +38,8 @@ spec:
           runAsUser: 2000
           readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
+          capabilities:
+              drop: ["ALL"]
         command:
           - bash
           - -c
