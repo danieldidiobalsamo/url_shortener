@@ -47,7 +47,7 @@ impl Config {
 
     /// Split socket string into separate ip/port variables
     pub fn split_app_socket(&self) -> (String, u16) {
-        let mut infos = self.app_socket.split(":");
+        let mut infos = self.app_socket.split(':');
 
         let ip = String::from(infos.next().unwrap());
         let port = infos.next().unwrap().parse::<u16>().unwrap();
