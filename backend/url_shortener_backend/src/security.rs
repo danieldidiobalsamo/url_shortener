@@ -9,11 +9,7 @@ pub fn sanitize_input(url: &str) -> String {
 
 /// Checks if the given input is a valid url
 pub fn is_url(input: &str) -> bool {
-    if let Ok(_) = Url::parse(input) {
-        return true;
-    } else {
-        return false;
-    }
+    matches!(Url::parse(input), Ok(_))
 }
 
 #[cfg(test)]
