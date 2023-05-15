@@ -15,7 +15,7 @@
 /// assert_eq!("d2af598", short::encode_url(raw));
 /// ```
 pub fn encode_url(url: &str) -> String {
-    let digest = format!("{:x}", md5::compute(&url));
+    let digest = format!("{:x}", md5::compute(url));
     digest[0..7].to_string()
 }
 
