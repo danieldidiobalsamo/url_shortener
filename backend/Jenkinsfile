@@ -1,0 +1,36 @@
+pipeline{
+	agent any
+
+	stages{
+		stage('Rust code'){
+			agent {
+	            docker { image 'rust:latest' }
+	        }
+			steps{
+				sh 'cargo check --manifest-path backend/Cargo.toml'
+				sh 'rustup component add clippy'
+				sh 'cargo clippy --manifest-path backend/Cargo.toml'
+			}
+		}
+
+		stage('kubeconform'){
+			agent {
+	            docker { image 'golang:latest' }
+	        }
+			steps{
+				// install helm
+				sh 'curl https://get.helm.sh/helm-v3.12.0-linux-amd64.tar.gz --output ./helm.tar.gz'
+				sh 'tar -zxvf helm.tar.gz'
+
+				sh 'GOCACHE=$WORKSPACE go install github.com/yannh/kubeconform/cmd/kubeconform@latest'
+
+				sh 'linux-amd64/helm template deployment/url-shortener-redis/ | kubeconform --verbose'
+				// checking 3 charts :
+				// url-shortener/charts/charts/url-shortener-backend
+				// url-shortener/charts/url-shortener-frontend
+				// url-shortener main one
+				sh 'linux-amd64/helm template deployment/url-shortener/ | kubeconform --verbose'
+			}
+		}
+	}
+}
