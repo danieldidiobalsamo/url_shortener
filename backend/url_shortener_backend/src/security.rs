@@ -1,6 +1,5 @@
 //! Provides functions to sanitize and check user inputs
 
-use ammonia;
 use url::Url;
 
 /// Sanitize content to prevent potential cross site scripting content

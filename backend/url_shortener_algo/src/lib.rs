@@ -6,8 +6,6 @@
 //! - hash the url using MD5
 //! - extract the 7 first characters
 
-use md5;
-
 /// Takes a url and returns 7 characters long key
 ///
 /// Example :
