@@ -100,7 +100,8 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allow_any_origin()
+            .allowed_origin("http://short.home")
+            .allowed_origin("http://short.home.backend")
             .allowed_methods(vec!["GET"]);
 
         App::new()
