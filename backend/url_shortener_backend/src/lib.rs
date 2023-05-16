@@ -6,7 +6,7 @@
 use std::{env, fs};
 
 /// Contains all environment variables for the application
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Config {
     /// read only endpoint to redis cluster (leader and followers)
     pub redis_ro_endpoint: String,
@@ -47,7 +47,7 @@ impl Config {
 
     /// Split socket string into separate ip/port variables
     pub fn split_app_socket(&self) -> (String, u16) {
-        let mut infos = self.app_socket.split(":");
+        let mut infos = self.app_socket.split(':');
 
         let ip = String::from(infos.next().unwrap());
         let port = infos.next().unwrap().parse::<u16>().unwrap();
