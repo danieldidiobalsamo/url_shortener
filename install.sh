@@ -16,6 +16,9 @@ echo -e 'Setup url-shortener redis cluster...\n'
 helm install url-shortener-redis danieldidiobalsamo/url-shortener-redis \
   --namespace url-shortener --version 0.1.1
 
+# ensuring there's at least one follower replica ready
+kubectl wait --for=jsonpath='{.status.availableReplicas}'=2 sts/redis-sts -n url-shortener
+
 ######################################################################
 # url-shortener chart installation and /etc/hosts update
 ######################################################################
