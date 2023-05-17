@@ -1,4 +1,4 @@
 /target
 .gitignore
-.git
 Dockerfile
+Jenkinsfile
