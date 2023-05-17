@@ -28,8 +28,8 @@ spec:
         runAsUser: 1000
       containers:
         - name: url-shortener-backend
-          image: docker.io/library/url-shortener-backend:latest
-          imagePullPolicy: Never
+          image: danieldidiobalsamo/url-shortener-backend:1.0.0
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           resources:

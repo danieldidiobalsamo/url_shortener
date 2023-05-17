@@ -18,8 +18,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: url-shortener-frontend
-          image: docker.io/library/url-shortener-frontend:latest
-          imagePullPolicy: Never
+          image: danieldidiobalsamo/url-shortener-frontend:1.0.0
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           resources:
