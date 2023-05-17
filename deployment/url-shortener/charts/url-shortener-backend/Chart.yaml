@@ -1,6 +1,6 @@
 apiVersion: v2
 name: url-shortener-backend
-version: 0.1.1
+version: 0.1.2
 description: backend part of a url shortener app developed using Rust and Redis
 type: application
 keywords:

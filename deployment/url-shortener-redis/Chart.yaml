@@ -1,5 +1,5 @@
 apiVersion: v2
 name: url-shortener-redis
-version: 0.1.0
+version: 0.1.1
 description: redis cluster for a url shortener app developed using Vue.js, Rust and Redis
 appVersion: "1.16.0"

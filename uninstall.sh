@@ -26,4 +26,6 @@ if (whiptail --title "url-shortener uninstall" --yesno "$text" 14 60) then
     echo "need permission to write in /etc/hosts:"
     echo $cmd
     $cmd
+
+    helm repo remove danieldidiobalsamo
 fi
