@@ -18,7 +18,8 @@ The main chart is only used to define the app endpoint, and to group front and b
 
 This project must run in an ingress enabled kubernetes cluster. If you don't have one you can quickly create it with [minikube](https://minikube.sigs.k8s.io/docs/start/).
 
-I strongly recommend to use the install script since it setups everything for you: charts installation and /etc/hosts file update with app domain name. [Helm](https://helm.sh/docs/intro/quickstart/) and [kubectl](https://kubernetes.io/docs/tasks/tools/) must be installed to use it.
+You don't have to build anything since everything is pushed on dockerhub and artifacthub (helm repository is [here](https://github.com/danieldidiobalsamo/helm-charts-repo)), and the install script setups everything for you: charts installation and /etc/hosts file update with app domain name. 
+[Helm](https://helm.sh/docs/intro/quickstart/) and [kubectl](https://kubernetes.io/docs/tasks/tools/) must be installed to use it.
 
 ~~~
 # [optional] if you want to use minikube
