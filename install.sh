@@ -8,18 +8,21 @@
 kubectl create ns url-shortener
 kubectl create secret generic redis-passwd --from-literal=passwd=`openssl rand -hex 60` -n url-shortener
 
+helm repo add danieldidiobalsamo https://danieldidiobalsamo.github.io/helm-charts-repo/
+helm repo update
+
 # deploy app
 echo -e 'Setup url-shortener redis cluster...\n'
-helm install url-shortener-redis deployment/url-shortener-redis \
-  --namespace url-shortener
+helm install url-shortener-redis danieldidiobalsamo/url-shortener-redis \
+  --namespace url-shortener --version 0.1.1
 
 ######################################################################
 # url-shortener chart installation and /etc/hosts update
 ######################################################################
 
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
-helm install url-shortener deployment/url-shortener \
-  --namespace url-shortener
+helm install url-shortener danieldidiobalsamo/url-shortener \
+  --namespace url-shortener --version 0.1.1
 
 # helm install --wait doesn't wait for ingress to get an IP
 function getIngressIP () {

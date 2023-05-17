@@ -1,6 +1,6 @@
 apiVersion: v2
 name: url-shortener-frontend
-version: 0.1.0
+version: 0.1.1
 description: frontend part of a url shortener app developed using Vue.js, Rust and Redis
 type: application
 keywords:
