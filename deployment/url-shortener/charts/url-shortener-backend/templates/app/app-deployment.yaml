@@ -28,7 +28,7 @@ spec:
         runAsUser: 1000
       containers:
         - name: url-shortener-backend
-          image: danieldidiobalsamo/url-shortener-backend:1.0.0
+          image: danieldidiobalsamo/url-shortener-backend:1.0.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -60,7 +60,6 @@ spec:
             httpGet:
               path: /health
               port: 8080
-            initialDelaySeconds: 15
             periodSeconds: 3
           readinessProbe:
             httpGet:

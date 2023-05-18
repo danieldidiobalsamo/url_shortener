@@ -25,7 +25,7 @@ kubectl wait --for=jsonpath='{.status.availableReplicas}'=2 sts/redis-sts -n url
 
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
 helm install url-shortener danieldidiobalsamo/url-shortener \
-  --namespace url-shortener --version 0.1.1
+  --namespace url-shortener --version 0.1.2
 
 # helm install --wait doesn't wait for ingress to get an IP
 function getIngressIP () {

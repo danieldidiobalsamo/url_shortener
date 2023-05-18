@@ -37,9 +37,10 @@ async fn shorten_url_request(
         Ok(_) => HttpResponse::build(http::StatusCode::OK).body(short),
         Err(err) => {
             let msg = format!(
-                "Can't set key/value on redis: {:?} {:?}",
+                "Can't set key/value on redis: {:?} {:?}\nconnection dropped :{}",
                 err.kind(),
-                err.detail()
+                err.detail(),
+                err.is_connection_dropped()
             );
 
             println!("{}", msg);
@@ -63,10 +64,11 @@ async fn retrieve_full_url(
             .body("redirecting..."),
         Err(err) => {
             let msg = format!(
-                "Can't get full url corresponding to {:?}: {:?} {:?}",
+                "Can't get full url corresponding to {:?}: {:?} {:?}\n connection dropped :{}",
                 &key,
                 err.kind(),
-                err.detail()
+                err.detail(),
+                err.is_connection_dropped()
             );
 
             println!("{}", msg);
@@ -77,8 +79,24 @@ async fn retrieve_full_url(
 
 /// Reply kubernetes liveness probe
 #[get("/health")]
-async fn health() -> impl Responder {
-    HttpResponse::build(http::StatusCode::OK)
+async fn health(redis: web::Data<Mutex<RedisClient>>) -> impl Responder {
+    let mut redis = redis.lock().unwrap();
+
+    match redis.add_url::<String>("health probe", "health probe") {
+        Ok(_) => HttpResponse::build(http::StatusCode::OK).body(""),
+        Err(err) => {
+            let msg = format!("Health probe failed : {:?}", err);
+            let msg = format!(
+                "{} \n connection dropped :{}",
+                msg,
+                err.is_connection_dropped()
+            );
+
+            println!("{}", msg);
+
+            HttpResponse::build(http::StatusCode::INTERNAL_SERVER_ERROR).body(msg)
+        }
+    }
 }
 
 /// Setup actix server
