@@ -2,6 +2,8 @@ namespace: url-shortener
 
 url-shortener-frontend:
   applicationDomainName: "short.home"
+  prod: false
 
 url-shortener-backend:
   applicationDomainName: "short.home.backend"
+  prod: false

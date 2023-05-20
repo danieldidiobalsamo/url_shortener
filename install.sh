@@ -12,9 +12,21 @@ helm repo add danieldidiobalsamo https://danieldidiobalsamo.github.io/helm-chart
 helm repo update
 
 # deploy app
+
+prod=true # false = local image for dev; true = the one pushed on dockerhub; same for charts
+chart="danieldidiobalsamo/url-shortener-redis"
+version="0.1.1"
+
+if [ "$prod" = false ]
+then
+  chart="deployment/url-shortener-redis" # local path
+  version="latest"
+fi
+
 echo -e 'Setup url-shortener redis cluster...\n'
-helm install url-shortener-redis danieldidiobalsamo/url-shortener-redis \
-  --namespace url-shortener --version 0.1.1
+helm install url-shortener-redis $chart \
+  --namespace url-shortener \
+  --version $version
 
 # ensuring there's at least one follower replica ready
 kubectl wait --for=jsonpath='{.status.availableReplicas}'=2 sts/redis-sts -n url-shortener
@@ -22,10 +34,21 @@ kubectl wait --for=jsonpath='{.status.availableReplicas}'=2 sts/redis-sts -n url
 ######################################################################
 # url-shortener chart installation and /etc/hosts update
 ######################################################################
+chart="danieldidiobalsamo/url-shortener"
+version="0.1.2"
+
+if [ "$prod" = false ]
+then
+  chart="deployment/url-shortener" # local path
+  version="latest"
+fi
 
 echo -e 'Setup url-shortener application and wait for pods / ingress...\n'
-helm install url-shortener danieldidiobalsamo/url-shortener \
-  --namespace url-shortener --version 0.1.2
+helm install url-shortener $chart \
+  --namespace url-shortener \
+  --version $version \
+  --set url-shortener-backend.prod=$prod \
+  --set url-shortener-frontend.prod=$prod
 
 # helm install --wait doesn't wait for ingress to get an IP
 function getIngressIP () {
