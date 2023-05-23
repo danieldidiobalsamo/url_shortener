@@ -1,6 +1,6 @@
 apiVersion: v2
 name: url-shortener
-version: 0.1.2
+version: 0.1.3
 description: A Helm chart for Kubernetes
 type: application
 description: url shortener app developed using Rust, Redis and Vue.js
@@ -15,8 +15,8 @@ sources:
 appVersion: "1.16.0"
 dependencies:
 - name: url-shortener-backend
-  version: "0.1.3"
+  version: "0.1.4"
   repository: "https://danieldidiobalsamo.github.io/helm-charts-repo/"
 - name: url-shortener-frontend
-  version: "0.1.1"
+  version: "0.1.2"
   repository: "https://danieldidiobalsamo.github.io/helm-charts-repo/"

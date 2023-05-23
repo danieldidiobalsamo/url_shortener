@@ -35,7 +35,7 @@ kubectl wait --for=jsonpath='{.status.availableReplicas}'=2 sts/redis-sts -n url
 # url-shortener chart installation and /etc/hosts update
 ######################################################################
 chart="danieldidiobalsamo/url-shortener"
-version="0.1.2"
+version="0.1.3"
 
 if [ "$prod" = false ]
 then
