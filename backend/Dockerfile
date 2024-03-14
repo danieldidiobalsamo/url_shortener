@@ -23,7 +23,7 @@ COPY --from=cacher /usr/local/cargo /usr/local/cargo
 RUN cargo build --release
 
 # use a very small image to run the app
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 RUN useradd -ms /bin/bash url_shortener_backend # always run with this less-privileged user, and never root
 USER url_shortener_backend
 COPY --from=builder /app/target/release/url_shortener_backend /usr/local/bin/url_shortener_backend
