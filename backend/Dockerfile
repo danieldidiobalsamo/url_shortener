@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # create rust env with cargo chef crate
-FROM rust:latest AS chef
+FROM rust:1 AS chef
 WORKDIR /app
 RUN cargo install cargo-chef
 
